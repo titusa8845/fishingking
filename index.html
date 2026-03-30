@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>義方金魚王：及時排行系統</title>
+    <title>義方金魚王：海洋世界排行版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <style>
@@ -15,23 +15,28 @@
         }
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background: #020617;
+            background: linear-gradient(to bottom, #020617 0%, #0c4a6e 100%);
             color: #f1f5f9;
             min-height: 100vh;
             overflow-x: hidden;
+            margin: 0;
         }
         .oswald { font-family: 'Oswald', sans-serif; }
         
         @keyframes fillUp { from { height: 0; opacity: 0; } to { opacity: 1; } }
 
+        /* --- 領獎台容器 --- */
         .podium-container {
             display: flex;
             justify-content: center;
             align-items: flex-end;
-            gap: 8px;
-            height: 480px;
-            margin-bottom: 60px;
+            gap: 10px;
+            height: 450px;
+            margin-bottom: 40px;
             padding: 0 10px;
+            position: relative;
+            z-index: 10;
+            perspective: 1000px;
         }
 
         .podium-column {
@@ -39,47 +44,67 @@
             flex-direction: column;
             align-items: center;
             width: 9%;
-            min-width: 65px;
+            min-width: 60px;
             transition: all 0.5s ease;
+            transform-origin: bottom center; /* 搖擺點在底部 */
+            animation: seaweedSway 4s ease-in-out infinite; /* 水藻搖擺動畫 */
+        }
+
+        /* 讓晃動錯開 */
+        .podium-column:nth-child(2n) { animation-delay: -1s; animation-duration: 5s; }
+        .podium-column:nth-child(3n) { animation-delay: -2s; animation-duration: 6s; }
+
+        @keyframes seaweedSway {
+            0%, 100% { transform: rotate(-2deg) skewX(-1deg); }
+            50% { transform: rotate(2deg) skewX(1deg); }
         }
 
         .bar-wrapper {
             width: 100%;
-            height: 350px;
+            height: 320px;
             position: relative;
-            background: rgba(255, 255, 255, 0.02);
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border-top-left-radius: 25px; /* 圓潤的水藻頭 */
+            border-top-right-radius: 25px;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(4px);
         }
 
         .bar-fill {
             width: 100%;
             height: 0;
-            background: linear-gradient(to top, transparent, currentColor);
-            box-shadow: 0 0 20px currentColor;
+            background: linear-gradient(to top, rgba(255,255,255,0.15), currentColor);
+            box-shadow: 0 0 25px currentColor;
             animation: fillUp 2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-            position: absolute;
-            bottom: 0;
+            position: absolute; bottom: 0;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
         }
 
+        /* 由下往上的氣泡能量注入特效 */
         .bar-fill::after {
             content: '';
-            position: absolute;
+            position: absolute; 
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            animation: lightMove 2.5s infinite linear;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.5) 15%, transparent 15%);
+            background-size: 25px 40px; /* 控制氣泡間距 */
+            background-position: 0 0;
+            animation: bubbleRise 3s infinite linear;
+            opacity: 0.4;
         }
 
-        @keyframes lightMove { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+        @keyframes bubbleRise {
+            0% { background-position: 0 100%; }
+            100% { background-position: 0 0%; }
+        }
 
         .rank-label {
             font-family: 'Oswald', sans-serif;
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 900;
-            opacity: 0.1;
-            margin-top: 10px;
+            opacity: 0.2;
+            margin-top: 5px;
         }
 
         .neon-1 { color: var(--neon-1); } .neon-2 { color: var(--neon-2); }
@@ -88,160 +113,98 @@
         .neon-7 { color: var(--neon-7); } .neon-8 { color: var(--neon-8); }
         .neon-9 { color: var(--neon-9); } .neon-10 { color: var(--neon-10); }
 
-        /* 第一名特別高光 - 修正位置 */
-        .rank-1-column .bar-fill {
-            filter: brightness(1.2);
-            box-shadow: 0 0 35px var(--neon-1);
-        }
+        .rank-1-column .bar-fill { filter: brightness(1.3); box-shadow: 0 0 45px var(--neon-1); }
 
-        #fishBackground {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            overflow: hidden;
-            pointer-events: none;
-            background: linear-gradient(to bottom, #020617 0%, #082f49 100%); /* 深海漸層 */
-        }
-        .bg-fish {
-            position: absolute;
-            white-space: nowrap;
-            user-select: none;
-            will-change: transform;
-            opacity: 0.4;
-        }
-        @keyframes swimLeft {
-            from { transform: translateX(105vw) scaleX(-1); } /* 往左游時翻轉 */
-            to { transform: translateX(-20vw) scaleX(-1); }
-        }
-        @keyframes swimRight {
-            from { transform: translateX(-20vw); }
-            to { transform: translateX(105vw); }
-        }
-        @keyframes bobbing {
-            0%, 100% { margin-top: 0; }
-            50% { margin-top: -20px; }
-        }
+        /* --- 動態海洋與海浪 --- */
+        #fishBackground { position: fixed; inset: 0; z-index: -2; overflow: hidden; pointer-events: none; }
+        .bg-fish { position: absolute; white-space: nowrap; user-select: none; opacity: 0.5; will-change: transform; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3)); }
+        @keyframes swimLeft { from { transform: translateX(110vw) scaleX(-1); } to { transform: translateX(-20vw) scaleX(-1); } }
+        @keyframes swimRight { from { transform: translateX(-20vw); } to { transform: translateX(110vw); } }
+        @keyframes bobbing { 0%, 100% { margin-top: 0; } 50% { margin-top: -15px; } }
 
-        /* --- 可愛卡通海浪 --- */
-        .wave-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 120px;
-            z-index: -1;
-            pointer-events: none;
-        }
-        .waves {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-        /* 海浪動畫 */
-        .parallax > use {
-            animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite;
-        }
-        .parallax > use:nth-child(1) { animation-delay: -2s; animation-duration: 7s; }
-        .parallax > use:nth-child(2) { animation-delay: -3s; animation-duration: 10s; }
-        .parallax > use:nth-child(3) { animation-delay: -4s; animation-duration: 13s; }
-        .parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 20s; }
-
-        @keyframes move-forever {
-            0% { transform: translate3d(-90px,0,0); }
-            100% { transform: translate3d(85px,0,0); }
-        }
+        .wave-wrapper { position: fixed; bottom: 0; width: 100%; height: 120px; z-index: -1; overflow: hidden; pointer-events: none; }
+        .wave { position: absolute; bottom: 0; left: 0; width: 200%; height: 100%; background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg"><path d="M0 0c100 0 200 50 300 50s200-50 300-50 200 50 300 50 200-50 300-50v70H0V0z" fill="%230ea5e9" fill-opacity="0.4"/></svg>') repeat-x; background-size: 50% 100%; animation: waveMove 12s linear infinite; }
+        .wave2 { animation: waveMove 18s linear infinite; height: 80%; opacity: 0.6; }
+        .wave3 { animation: waveMove 25s linear infinite; height: 60%; }
+        @keyframes waveMove { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
     </style>
 </head>
-<body class="p-2 md:p-6">
+<body>
     <div id="fishBackground"></div>
-    
-    <!-- 卡通海浪 HTML -->
-    <div class="wave-container">
-        <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-        viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
-            <defs>
-                <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
-            </defs>
-            <g class="parallax">
-                <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(14, 165, 233, 0.3)" />
-                <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(14, 165, 233, 0.5)" />
-                <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(14, 165, 233, 0.7)" />
-                <use xlink:href="#gentle-wave" x="48" y="7" fill="#0ea5e9" />
-            </g>
-        </svg>
+    <div class="wave-wrapper">
+        <div class="wave wave1"></div>
+        <div class="wave wave2" style="bottom: -10px;"></div>
+        <div class="wave wave3" style="bottom: -20px;"></div>
     </div>
 
-    <div class="max-w-[1400px] mx-auto">
-        <header class="text-center mb-16">
-            <h1 class="text-7xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 to-yellow-600 mb-4 italic tracking-tighter">義方金魚王</h1>
-            <p class="text-cyan-400 font-bold tracking-[0.5em] text-3xl uppercase">及時戰況看板</p>
+    <div class="max-w-[1400px] mx-auto p-4">
+        <header class="text-center mt-8 mb-10">
+            <h1 class="text-7xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 to-yellow-500 mb-2 italic tracking-tighter drop-shadow-2xl">義方金魚王</h1>
+            <p class="text-cyan-300 font-bold tracking-[0.4em] text-3xl uppercase">及時戰況看板</p>
         </header>
 
         <section id="podium" class="podium-container"></section>
 
-        <section class="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 md:p-10 backdrop-blur-md mb-20">
-            <h3 class="text-xl font-black mb-8 flex items-center gap-3">
-                <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span> 挑戰者名單 (11+)
+        <section class="bg-slate-950/40 border border-white/10 rounded-[40px] p-8 md:p-10 backdrop-blur-xl mb-20 shadow-2xl">
+            <h3 class="text-2xl font-black mb-8 flex items-center gap-4">
+                <span class="w-2 h-8 bg-cyan-400 rounded-full animate-pulse"></span> 挑戰者實況 (11+)
             </h3>
-            <ul id="leaderboardList" class="grid grid-cols-1 md:grid-cols-3 gap-4"></ul>
+            <ul id="leaderboardList" class="grid grid-cols-1 md:grid-cols-3 gap-6"></ul>
         </section>
 
-        <footer class="flex justify-center gap-8 pb-20">
-            <button onclick="toggleView('input')" class="bg-cyan-600 hover:bg-cyan-500 text-white font-black px-16 py-5 rounded-2xl text-2xl shadow-xl transition-all active:scale-95">回報戰績 🎣</button>
-            <button onclick="toggleView('admin')" class="bg-slate-800 text-slate-500 px-6 py-5 rounded-2xl text-sm font-bold">⚙️</button>
+        <footer class="flex justify-center gap-10 pb-32">
+            <button onclick="toggleView('input')" class="bg-cyan-500 hover:bg-cyan-400 text-white font-black px-20 py-6 rounded-3xl text-3xl shadow-lg transition-all active:scale-95">回報戰績 🎣</button>
+            <button onclick="toggleView('admin')" class="bg-slate-800/50 text-slate-400 px-8 py-6 rounded-3xl text-xl font-bold">⚙️</button>
         </footer>
     </div>
 
-    <!-- 📥 報分彈窗 -->
-    <div id="inputModal" class="fixed inset-0 bg-black/95 hidden flex flex-col items-center justify-center p-6 z-[99999] backdrop-blur-2xl">
-        <div class="w-full max-w-md text-center">
-            <h2 class="text-4xl font-black mb-12 text-yellow-400">回報戰績</h2>
-            <input type="text" id="playerName" placeholder="你的暱稱" class="bg-slate-800 border-2 border-slate-700 p-6 rounded-2xl w-full text-center text-2xl mb-10 outline-none focus:border-cyan-500">
-            <div class="flex items-center justify-center gap-10 mb-12">
-                <button onclick="changeCount(-1)" class="w-20 h-20 bg-slate-800 rounded-full text-5xl font-bold">-</button>
-                <span id="currentCount" class="oswald text-8xl font-black min-w-[160px] text-cyan-400">0</span>
-                <button onclick="changeCount(1)" class="w-20 h-20 bg-slate-800 rounded-full text-5xl font-bold">+</button>
+    <!-- 彈窗內容保持完整 (報分, 管理, 插播) -->
+    <div id="inputModal" class="fixed inset-0 bg-black/90 hidden flex flex-col items-center justify-center p-6 z-[1000] backdrop-blur-2xl">
+        <div class="w-full max-w-lg text-center">
+            <h2 class="text-5xl font-black mb-12 text-yellow-400">回報戰績</h2>
+            <input type="text" id="playerName" placeholder="你的暱稱" class="bg-slate-800 border-4 border-slate-700 p-8 rounded-3xl w-full text-center text-4xl mb-12 outline-none focus:border-cyan-400 text-white font-bold">
+            <div class="flex items-center justify-center gap-12 mb-12">
+                <button onclick="changeCount(-1)" class="w-24 h-24 bg-slate-700 rounded-full text-6xl font-bold">-</button>
+                <span id="currentCount" class="oswald text-9xl font-black min-w-[200px] text-cyan-400">0</span>
+                <button onclick="changeCount(1)" class="w-24 h-24 bg-slate-700 rounded-full text-6xl font-bold">+</button>
             </div>
-            <div class="flex gap-4 mb-10">
-                <button onclick="changeCount(10)" class="bg-slate-800 flex-1 py-4 rounded-xl font-bold text-xl">+10</button>
-                <button onclick="changeCount(50)" class="bg-slate-800 flex-1 py-4 rounded-xl font-bold text-xl">+50</button>
+            <div class="flex gap-6 mb-12">
+                <button onclick="changeCount(10)" class="bg-slate-800 flex-1 py-6 rounded-2xl font-bold text-2xl border-2 border-slate-700">+10</button>
+                <button onclick="changeCount(50)" class="bg-slate-800 flex-1 py-6 rounded-2xl font-bold text-2xl border-2 border-slate-700">+50</button>
             </div>
-            <div class="flex flex-col gap-4">
-                <button onclick="submitScore()" id="btnSubmit" class="bg-yellow-500 text-slate-950 font-black py-6 rounded-2xl text-2xl shadow-2xl">確認送出</button>
-                <button onclick="toggleView('main')" class="text-slate-500 font-bold py-4">返回主頁</button>
+            <div class="flex flex-col gap-6">
+                <button onclick="submitScore()" id="btnSubmit" class="bg-yellow-500 text-slate-950 font-black py-8 rounded-[30px] text-4xl shadow-2xl active:scale-95">確認送出</button>
+                <button onclick="toggleView('main')" class="text-slate-400 font-bold text-2xl py-4">返回主頁</button>
             </div>
         </div>
     </div>
 
-    <!-- ⚙️ 管理員彈窗 -->
-    <div id="adminModal" class="fixed inset-0 bg-slate-950/98 hidden flex flex-col items-center justify-center p-6 z-[99999] backdrop-blur-3xl">
-        <div class="w-full max-w-lg">
-            <h2 class="text-3xl font-black mb-10 text-center">⚙️ 管理系統</h2>
-            <div id="adminAuth" class="text-center">
-                <input type="password" id="adminPass" placeholder="輸入管理密碼" class="bg-slate-800 border-2 border-slate-700 p-5 rounded-xl w-full text-center text-2xl mb-8 outline-none">
-                <button onclick="verifyAdmin()" class="bg-cyan-600 px-12 py-4 rounded-xl font-bold text-xl">進入管理面板</button>
-                <button onclick="toggleView('main')" class="block mx-auto mt-8 text-slate-500">取消</button>
+    <div id="adminModal" class="fixed inset-0 bg-black/95 hidden flex flex-col items-center justify-center p-6 z-[1000] backdrop-blur-3xl">
+        <div class="w-full max-w-xl text-center">
+            <h2 class="text-4xl font-black mb-12">⚙️ 管理系統</h2>
+            <div id="adminAuth">
+                <input type="password" id="adminPass" placeholder="輸入密碼" class="bg-slate-800 border-2 border-slate-700 p-6 rounded-2xl w-full text-center text-3xl mb-10 outline-none text-white">
+                <button onclick="verifyAdmin()" class="bg-cyan-600 px-16 py-5 rounded-2xl font-bold text-2xl">進入面板</button>
+                <button onclick="toggleView('main')" class="block mx-auto mt-10 text-slate-500 text-xl">取消</button>
             </div>
-            <div id="adminPanel" class="hidden space-y-10">
-                <div class="bg-red-900/20 border border-red-500/30 p-10 rounded-[40px] text-center">
-                    <h3 class="text-2xl font-bold text-red-400 mb-4">☢️ 危險操作</h3>
-                    <p class="text-slate-400 mb-8">確定要清空嗎？此動作無法復原！</p>
-                    <button onclick="resetLeaderboard()" id="btnReset" class="bg-red-600 hover:bg-red-500 text-white font-black px-12 py-5 rounded-2xl text-xl shadow-2xl">一鍵清空所有紀錄</button>
+            <div id="adminPanel" class="hidden space-y-12">
+                <div class="bg-red-950/30 border border-red-500/30 p-12 rounded-[50px]">
+                    <h3 class="text-3xl font-bold text-red-400 mb-6">☢️ 危險區</h3>
+                    <button onclick="resetLeaderboard()" id="btnReset" class="bg-red-600 hover:bg-red-500 text-white font-black px-16 py-6 rounded-[30px] text-2xl shadow-2xl">一鍵清空所有紀錄</button>
                 </div>
-                <button onclick="toggleView('main')" class="w-full py-5 bg-slate-800 rounded-2xl font-bold text-slate-300">關閉面板</button>
+                <button onclick="toggleView('main')" class="w-full py-6 bg-slate-800 rounded-3xl font-bold text-slate-300 text-2xl">返回</button>
             </div>
         </div>
     </div>
 
-    <!-- 📢 插播遮罩 -->
-    <div id="broadcastOverlay" class="fixed inset-0 bg-black/98 hidden flex-col items-center justify-center p-6 text-center z-[100000]">
-        <div class="animate-pulse mb-10 text-6xl font-black text-yellow-400 tracking-[0.6em]">NEW RECORD</div>
-        <div class="bg-white/5 p-20 rounded-[60px] border border-white/10 shadow-2xl">
-            <h2 id="b-name" class="text-8xl font-black mb-6 italic">---</h2>
-            <div class="oswald text-[12rem] font-black text-yellow-400 leading-none mb-8"><span id="b-count">0</span><span class="text-3xl ml-4">FISH</span></div>
-            <h3 id="b-title" class="text-5xl font-black text-slate-900 bg-yellow-400 px-14 py-8 rounded-3xl inline-block shadow-2xl">👑 義方金魚王</h3>
+    <div id="broadcastOverlay" class="fixed inset-0 bg-black/98 hidden flex-col items-center justify-center p-6 text-center z-[2000]">
+        <div class="animate-pulse mb-12 text-7xl font-black text-yellow-400 tracking-[0.5em]">NEW RECORD</div>
+        <div class="bg-white/5 p-24 rounded-[80px] border border-white/10 shadow-2xl backdrop-blur-3xl">
+            <h2 id="b-name" class="text-9xl font-black mb-8 italic text-white">---</h2>
+            <div class="oswald text-[15rem] font-black text-yellow-400 leading-none mb-10"><span id="b-count">0</span><span class="text-4xl ml-6">FISH</span></div>
+            <h3 id="b-title" class="text-6xl font-black text-slate-900 bg-yellow-400 px-20 py-10 rounded-[40px] inline-block shadow-2xl">👑 義方金魚王</h3>
         </div>
-        <div class="mt-20"><p id="b-heckle" class="text-4xl text-cyan-400 font-black italic typewriter">---</p></div>
+        <div class="mt-24"><p id="b-heckle" class="text-5xl text-cyan-300 font-black italic">---</p></div>
     </div>
 
     <script>
@@ -274,9 +237,9 @@
                 const fillHeight = (max === 0 || data.count === 0) ? 0 : (data.count / max) * 100;
 
                 column.innerHTML = `
-                    <div class="text-center mb-2 w-full">
-                        <span class="block text-[11px] font-bold text-slate-400 truncate px-1">${data.name}</span>
-                        <span class="oswald text-xl font-bold neon-${rank}">${data.count}</span>
+                    <div class="text-center mb-3 w-full">
+                        <span class="block text-[12px] font-bold text-slate-300 truncate px-1">${data.name}</span>
+                        <span class="oswald text-2xl font-bold neon-${rank}">${data.count}</span>
                     </div>
                     <div class="bar-wrapper">
                         <div id="bar-${rank}" class="bar-fill neon-${rank}" style="height: 0%"></div>
@@ -296,18 +259,18 @@
             listEl.innerHTML = "";
             const others = scores.slice(10);
             if (others.length === 0) {
-                listEl.innerHTML = `<li class="col-span-full py-10 text-center text-slate-700 italic font-bold">目前無更多挑戰者數據...</li>`;
+                listEl.innerHTML = `<li class="col-span-full py-16 text-center text-slate-500 italic text-2xl font-bold">海洋正在等待新的挑戰者...</li>`;
                 return;
             }
             others.forEach((p, idx) => {
                 const li = document.createElement('li');
-                li.className = "flex items-center justify-between bg-slate-800/30 p-6 rounded-2xl border border-white/5 hover:bg-slate-800/50 transition-all";
+                li.className = "flex items-center justify-between bg-white/5 p-8 rounded-[30px] border border-white/5 hover:bg-white/10 transition-all";
                 li.innerHTML = `
-                    <div class="flex items-center gap-4">
-                        <span class="oswald text-slate-600 text-2xl font-bold">#${idx + 11}</span>
-                        <div class="font-black text-xl">${p.name}</div>
+                    <div class="flex items-center gap-6">
+                        <span class="oswald text-slate-500 text-3xl font-bold">#${idx + 11}</span>
+                        <div class="font-black text-2xl text-white">${p.name}</div>
                     </div>
-                    <div class="oswald text-3xl font-black text-slate-400">${p.count}</div>
+                    <div class="oswald text-4xl font-black text-slate-300">${p.count}</div>
                 `;
                 listEl.appendChild(li);
             });
@@ -332,11 +295,11 @@
         }
 
         async function resetLeaderboard() {
-            if (!confirm("確定要清空嗎？")) return;
+            if (!confirm("確定要重置嗎？")) return;
             try {
                 const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET", key: document.getElementById('adminPass').value }) });
-                if (await res.text() === "RESET_SUCCESS") { alert("已清空！"); location.reload(); }
-            } catch (err) { alert("錯誤！"); }
+                if (await res.text() === "RESET_SUCCESS") { alert("已重置！"); location.reload(); }
+            } catch (err) { alert("失敗"); }
         }
 
         function changeCount(val) { currentInputCount = Math.max(0, currentInputCount + val); document.getElementById('currentCount').innerText = currentInputCount; }
@@ -348,8 +311,8 @@
             try {
                 await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "ADD_SCORE", name: name, count: currentInputCount }) });
                 if (currentInputCount >= 50 || (scores[0] && currentInputCount > scores[0].count)) { triggerBroadcast(name, currentInputCount); }
-                else { alert("報分成功！"); location.reload(); }
-            } catch (err) { alert("失敗"); btn.disabled = false; btn.innerText = "確認送出"; }
+                else { alert("回報成功！"); location.reload(); }
+            } catch (err) { alert("錯誤"); btn.disabled = false; btn.innerText = "確認送出"; }
         }
 
         function triggerBroadcast(name, count) {
@@ -369,24 +332,24 @@
         setInterval(fetchScores, 5000);
 
         const fishEmojis = ['🐟', '🐠', '🐡', '🐙', '🦑', '🦐', '🦀', '🦈', '🐋', '🐳', '🧜‍♂️', '🧜‍♀️'];
+        const bgContainer = document.getElementById('fishBackground');
         function createFish() {
             const fish = document.createElement('div');
             const emoji = fishEmojis[Math.floor(Math.random() * fishEmojis.length)];
             const direction = Math.random() > 0.5 ? 'right' : 'left';
-            const size = Math.floor(Math.random() * 30) + 20;
-            const duration = Math.floor(Math.random() * 15) + 10;
-            const top = Math.floor(Math.random() * 90);
+            const size = Math.floor(Math.random() * 40) + 30;
+            const duration = Math.floor(Math.random() * 20) + 15;
+            const top = Math.floor(Math.random() * 85);
             fish.className = 'bg-fish';
             fish.innerText = emoji;
             fish.style.fontSize = `${size}px`;
             fish.style.top = `${top}%`;
-            fish.style.animation = `${direction === 'right' ? 'swimRight' : 'swimLeft'} ${duration}s linear forwards, bobbing 3s ease-in-out infinite`;
-            if (direction === 'left') fish.style.transform = 'scaleX(-1)';
-            document.getElementById('fishBackground').appendChild(fish);
+            fish.style.animation = `${direction === 'right' ? 'swimRight' : 'swimLeft'} ${duration}s linear forwards, bobbing 4s ease-in-out infinite`;
+            bgContainer.appendChild(fish);
             setTimeout(() => { fish.remove(); }, duration * 1000);
         }
-        setInterval(createFish, 2000);
-        for(let i=0; i<5; i++) setTimeout(createFish, Math.random() * 5000);
+        setInterval(createFish, 1200);
+        for(let i=0; i<10; i++) setTimeout(createFish, Math.random() * 5000);
     </script>
 </body>
 </html>
