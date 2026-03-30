@@ -3,187 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>義方金魚王：UX 夜市及時排行系統</title>
+    <title>義方金魚王：及時排行系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-gold: #fbbf24;
             --neon-silver: #94a3b8;
             --neon-bronze: #b45309;
-            --neon-pink: #f43f5e;
             --neon-cyan: #22d3ee;
+            --neon-pink: #f43f5e;
+            --bg-dark: #0f172a;
         }
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-            overflow-x: hidden;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
         }
-        .neon-text-gold { text-shadow: 0 0 10px var(--neon-gold); color: var(--neon-gold); }
-        .neon-border-gold { box-shadow: 0 0 15px var(--neon-gold); border-color: var(--neon-gold); }
+        .oswald { font-family: 'Oswald', sans-serif; }
         
-        /* 領獎台長條圖動畫 */
+        /* 霓虹發光效果 */
+        .neon-glow-gold { text-shadow: 0 0 15px var(--neon-gold); }
+        .neon-border-gold { box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); border: 2px solid var(--neon-gold); }
+        
+        /* 領獎台長條圖 - 玻璃擬態 */
         .podium-bar {
-            transition: height 1s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+            transition: all 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
             position: relative;
+            overflow: hidden;
+        }
+        .podium-bar::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: currentColor;
+            box-shadow: 0 0 15px currentColor;
         }
 
-        /* 插播遮罩 */
-        #broadcastOverlay {
-            display: none;
-            backdrop-filter: blur(12px);
-            z-index: 10000;
-        }
+        /* 插播動畫 */
+        @keyframes slideIn { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .broadcast-in { animation: slideIn 0.5s ease-out forwards; }
 
         /* 打字機效果 */
-        .typewriter {
+        .typewriter-text {
+            display: inline-block;
             overflow: hidden;
-            border-right: .15em solid var(--neon-cyan);
+            border-right: 3px solid var(--neon-cyan);
             white-space: nowrap;
-            margin: 0 auto;
-            letter-spacing: .15em;
-            animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+            letter-spacing: 0.1em;
+            width: 0;
         }
 
-        @keyframes typing { from { width: 0 } to { width: 100% } }
-        @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--neon-cyan); } }
+        /* 按鈕霓虹效果 */
+        .btn-neon {
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
+        }
+        .btn-neon:hover {
+            box-shadow: 0 0 25px rgba(34, 211, 238, 0.5);
+            transform: translateY(-2px);
+        }
 
-        /* 滾動條美化 */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #1e293b; }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        /* 呼吸感容器 */
+        .main-container {
+            max-width: 1000px;
+            padding: 40px 24px;
+        }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-2">
 
-    <!-- 主容器 -->
-    <div class="max-w-4xl mx-auto">
+    <div class="main-container mx-auto">
         
-        <!-- 標題區 -->
-        <header class="text-center mb-8">
-            <h1 class="text-5xl font-extrabold neon-text-gold mb-2">🎣 義方金魚王</h1>
-            <p class="text-slate-400">UX 夜市及時戰況看板</p>
+        <!-- 標題：極簡開闊 -->
+        <header class="text-center mb-16">
+            <h1 class="text-6xl md:text-7xl font-black neon-glow-gold mb-4 tracking-tighter">
+                🎣 義方金魚王
+            </h1>
+            <div class="flex justify-center items-center gap-3">
+                <span class="h-[1px] w-12 bg-slate-700"></span>
+                <p class="text-cyan-400 font-bold tracking-[0.3em] text-sm uppercase">Cyberpunk Night Market</p>
+                <span class="h-[1px] w-12 bg-slate-700"></span>
+            </div>
         </header>
 
-        <!-- 2-1-3 領獎台區域 -->
-        <section id="podium" class="flex justify-center items-end gap-2 md:gap-4 h-64 mb-12 border-b-4 border-slate-700 pb-2">
-            <!-- 第二名 (左) -->
-            <div class="flex flex-col items-center w-24 md:w-32">
-                <span id="p2-name" class="text-sm font-bold truncate w-full text-center">---</span>
-                <span id="p2-count" class="text-xl font-black text-slate-300">0</span>
-                <div id="p2-bar" class="podium-bar w-full bg-slate-400/40 border-t-4 border-slate-400" style="height: 0%;">
-                    <div class="absolute inset-0 flex items-center justify-center text-4xl font-black opacity-20">2</div>
+        <!-- 🏆 領獎台區域：大氣開闊 -->
+        <section id="podium" class="flex justify-center items-end gap-4 md:gap-8 h-[400px] mb-20">
+            <!-- 🥈 第二名 -->
+            <div class="flex flex-col items-center w-28 md:w-40 group">
+                <div class="mb-4 text-center">
+                    <span id="p2-name" class="block text-slate-400 font-bold text-lg mb-1 truncate w-full">---</span>
+                    <span id="p2-count" class="oswald text-4xl font-bold text-slate-300">0</span>
+                </div>
+                <div id="p2-bar" class="podium-bar w-full text-slate-400" style="height: 0%;">
+                    <div class="absolute inset-0 flex items-center justify-center text-8xl font-black opacity-5">2</div>
                 </div>
             </div>
-            <!-- 第一名 (中) -->
-            <div class="flex flex-col items-center w-32 md:w-40">
-                <div id="crown" class="animate-bounce mb-1">👑</div>
-                <span id="p1-name" class="text-lg font-bold truncate w-full text-center neon-text-gold">---</span>
-                <span id="p1-count" class="text-3xl font-black text-yellow-400">0</span>
-                <div id="p1-bar" class="podium-bar w-full bg-yellow-500/40 border-t-4 border-yellow-400" style="height: 0%;">
-                    <div class="absolute inset-0 flex items-center justify-center text-6xl font-black opacity-30">1</div>
+
+            <!-- 🥇 第一名 -->
+            <div class="flex flex-col items-center w-36 md:w-52 group">
+                <div class="mb-4 text-center">
+                    <div id="crown" class="text-4xl animate-bounce mb-2">👑</div>
+                    <span id="p1-name" class="block text-yellow-400 font-black text-2xl mb-1 truncate w-full neon-glow-gold">---</span>
+                    <span id="p1-count" class="oswald text-6xl font-black text-yellow-400">0</span>
+                </div>
+                <div id="p1-bar" class="podium-bar w-full text-yellow-400 neon-border-gold" style="height: 0%;">
+                    <div class="absolute inset-0 flex items-center justify-center text-9xl font-black opacity-10">1</div>
                 </div>
             </div>
-            <!-- 第三名 (右) -->
-            <div class="flex flex-col items-center w-24 md:w-32">
-                <span id="p3-name" class="text-sm font-bold truncate w-full text-center">---</span>
-                <span id="p3-count" class="text-xl font-black text-orange-600">0</span>
-                <div id="p3-bar" class="podium-bar w-full bg-orange-700/40 border-t-4 border-orange-700" style="height: 0%;">
-                    <div class="absolute inset-0 flex items-center justify-center text-4xl font-black opacity-20">3</div>
+
+            <!-- 🥉 第三名 -->
+            <div class="flex flex-col items-center w-28 md:w-40 group">
+                <div class="mb-4 text-center">
+                    <span id="p3-name" class="block text-orange-600 font-bold text-lg mb-1 truncate w-full">---</span>
+                    <span id="p3-count" class="oswald text-4xl font-bold text-orange-600">0</span>
+                </div>
+                <div id="p3-bar" class="podium-bar w-full text-orange-700" style="height: 0%;">
+                    <div class="absolute inset-0 flex items-center justify-center text-8xl font-black opacity-5">3</div>
                 </div>
             </div>
         </section>
 
-        <!-- 下方排行榜列表 -->
-        <section class="bg-slate-900/50 rounded-xl p-4 mb-8">
-            <h3 class="text-slate-400 text-sm font-bold mb-4 border-b border-slate-800 pb-2">及時排行清單</h3>
-            <ul id="leaderboardList" class="space-y-2">
-                <!-- 列表內容由 JS 生成 -->
-                <li class="flex justify-center py-8 text-slate-600">載入中...</li>
+        <!-- 📜 排行榜列表：層級分明 -->
+        <section class="bg-slate-900/40 border border-slate-800 rounded-3xl p-8 mb-12 backdrop-blur-md">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-xl font-black flex items-center gap-2">
+                    <span class="w-2 h-6 bg-cyan-500 rounded-full"></span>
+                    最新戰況清單
+                </h3>
+                <span id="lastUpdate" class="text-xs text-slate-500 font-mono italic">Syncing...</span>
+            </div>
+            
+            <ul id="leaderboardList" class="space-y-4">
+                <li class="py-12 text-center text-slate-500 font-bold italic tracking-widest">
+                    🌊 正在打撈數據中...
+                </li>
             </ul>
         </section>
 
-        <!-- 輸入與管理按鈕 -->
-        <footer class="flex justify-center gap-4">
-            <button onclick="toggleView('input')" class="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-full font-bold shadow-lg transition">我要報分 🎣</button>
-            <button onclick="toggleView('admin')" class="bg-slate-700 hover:bg-slate-600 px-4 py-3 rounded-full text-sm">管理模式 ⚙️</button>
+        <!-- 🕹️ 操作區 -->
+        <footer class="flex flex-col md:flex-row justify-center items-center gap-6 pb-20">
+            <button onclick="toggleView('input')" class="btn-neon bg-cyan-600 hover:bg-cyan-500 text-white font-black px-12 py-5 rounded-2xl text-xl transition-all flex items-center gap-3">
+                <span>報分挑戰</span> 🎣
+            </button>
+            <button onclick="toggleView('admin')" class="text-slate-500 hover:text-slate-300 transition-colors text-sm font-bold flex items-center gap-2">
+                管理模式 <span class="opacity-30">⚙️</span>
+            </button>
         </footer>
     </div>
 
-    <!-- [隱藏視窗] 報分介面 -->
-    <div id="inputModal" class="fixed inset-0 bg-black/90 hidden flex flex-col items-center justify-center p-6 z-[5000]">
-        <h2 class="text-3xl font-bold mb-8">🎣 回報戰果</h2>
-        <input type="text" id="playerName" placeholder="請輸入暱稱" class="bg-slate-800 border-2 border-slate-700 p-4 rounded-xl w-full max-w-sm text-center text-xl mb-6">
-        
-        <div class="flex items-center gap-6 mb-8">
-            <button onclick="changeCount(-1)" class="w-16 h-16 bg-red-600 rounded-full text-3xl font-bold">-</button>
-            <span id="currentCount" class="text-6xl font-black min-w-[100px] text-center">0</span>
-            <button onclick="changeCount(1)" class="w-16 h-16 bg-green-600 rounded-full text-3xl font-bold">+</button>
-        </div>
+    <!-- 📥 報分彈窗：超大按鈕 -->
+    <div id="inputModal" class="fixed inset-0 bg-slate-950/95 hidden flex flex-col items-center justify-center p-6 z-[9999] backdrop-blur-xl">
+        <div class="w-full max-w-lg text-center">
+            <h2 class="text-4xl font-black mb-12 neon-glow-gold">回報戰績</h2>
+            
+            <input type="text" id="playerName" placeholder="你的暱稱" 
+                class="bg-slate-800/50 border-2 border-slate-700 focus:border-cyan-500 p-6 rounded-2xl w-full text-center text-2xl mb-10 outline-none transition-all">
+            
+            <div class="flex items-center justify-center gap-10 mb-12">
+                <button onclick="changeCount(-1)" class="w-20 h-20 bg-slate-800 hover:bg-red-900/40 rounded-full text-4xl border border-slate-700 transition-all active:scale-90">-</button>
+                <span id="currentCount" class="oswald text-8xl font-black min-w-[150px] text-cyan-400">0</span>
+                <button onclick="changeCount(1)" class="w-20 h-20 bg-slate-800 hover:bg-green-900/40 rounded-full text-4xl border border-slate-700 transition-all active:scale-90">+</button>
+            </div>
 
-        <div class="flex gap-2 mb-8">
-            <button onclick="changeCount(5)" class="bg-slate-700 px-4 py-2 rounded-lg">+5</button>
-            <button onclick="changeCount(10)" class="bg-slate-700 px-4 py-2 rounded-lg">+10</button>
-            <button onclick="changeCount(20)" class="bg-slate-700 px-4 py-2 rounded-lg">+20</button>
-        </div>
+            <div class="grid grid-cols-3 gap-4 mb-12">
+                <button onclick="changeCount(5)" class="bg-slate-800 hover:bg-slate-700 py-4 rounded-xl font-bold text-lg transition-all">+5</button>
+                <button onclick="changeCount(10)" class="bg-slate-800 hover:bg-slate-700 py-4 rounded-xl font-bold text-lg transition-all">+10</button>
+                <button onclick="changeCount(20)" class="bg-slate-800 hover:bg-slate-700 py-4 rounded-xl font-bold text-lg transition-all">+20</button>
+            </div>
 
-        <div class="flex gap-4">
-            <button onclick="submitScore()" id="btnSubmit" class="bg-yellow-500 text-slate-900 font-black px-12 py-4 rounded-xl text-xl">確認送出！</button>
-            <button onclick="toggleView('main')" class="bg-slate-800 px-8 py-4 rounded-xl">取消</button>
+            <div class="flex flex-col gap-4">
+                <button onclick="submitScore()" id="btnSubmit" 
+                    class="btn-neon bg-yellow-500 text-slate-950 font-black py-6 rounded-2xl text-2xl shadow-xl">確認送出</button>
+                <button onclick="toggleView('main')" class="text-slate-500 font-bold py-4">返回主頁</button>
+            </div>
         </div>
     </div>
 
-    <!-- [隱藏視窗] 插播遮罩 -->
-    <div id="broadcastOverlay" class="fixed inset-0 flex flex-col items-center justify-center p-6 text-center">
-        <h1 class="text-5xl font-black neon-text-gold mb-8 animate-pulse">🎉 全場注意 🎉</h1>
-        <div class="bg-white/10 p-12 rounded-3xl border-4 border-yellow-400/50 shadow-2xl scale-110">
-            <h2 id="b-name" class="text-6xl font-black mb-4">玩家暱稱</h2>
-            <p class="text-2xl mb-4">剛剛撈到了</p>
-            <div class="text-9xl font-black text-yellow-400 mb-6"><span id="b-count">99</span><span class="text-4xl">隻</span></div>
-            <h3 id="b-title" class="text-5xl font-black neon-text-gold border-4 border-yellow-400 px-8 py-4 rounded-xl inline-block">👑 稱號出現</h3>
+    <!-- 📢 全場廣播插播 -->
+    <div id="broadcastOverlay" class="fixed inset-0 bg-slate-950/90 hidden flex-col items-center justify-center p-6 z-[10000] text-center">
+        <div class="broadcast-in bg-white/5 border-2 border-yellow-400/30 p-12 md:p-20 rounded-[40px] backdrop-blur-2xl shadow-[0_0_100px_rgba(251,191,36,0.15)] max-w-3xl">
+            <h1 class="text-4xl md:text-5xl font-black neon-glow-gold mb-10 tracking-[0.5em] animate-pulse">🎉 狂賀 🎉</h1>
+            <div class="mb-10">
+                <h2 id="b-name" class="text-6xl md:text-8xl font-black mb-6">---</h2>
+                <p class="text-slate-400 text-2xl font-bold italic">剛剛捕獲了</p>
+            </div>
+            <div class="oswald text-[10rem] md:text-[14rem] font-black text-yellow-400 leading-none mb-8 drop-shadow-2xl">
+                <span id="b-count">0</span>
+                <span class="text-3xl oswald">FISHES</span>
+            </div>
+            <h3 id="b-title" class="text-4xl md:text-5xl font-black text-slate-950 bg-yellow-400 px-12 py-6 rounded-2xl inline-block shadow-2xl">
+                👑 義方金魚王
+            </h3>
         </div>
-        <!-- 底部字幕 -->
-        <div class="fixed bottom-0 left-0 w-full bg-black/80 p-8 border-t-2 border-cyan-400">
-            <p id="b-heckle" class="text-3xl text-cyan-400 font-bold typewriter">「老闆說他準備要把攤位頂讓給你了...」</p>
+        
+        <div class="fixed bottom-0 left-0 w-full bg-slate-950/95 p-10 border-t border-cyan-500/30">
+            <div class="max-w-4xl mx-auto flex items-center justify-center gap-6">
+                <span class="text-cyan-500 text-3xl">「</span>
+                <p id="b-heckle" class="text-2xl md:text-4xl text-cyan-400 font-black tracking-tight italic">---</p>
+                <span class="text-cyan-500 text-3xl">」</span>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- 設定區 ---
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwzmoyqSBEL-C4SnzHsx9x03EWEn_gKR6XE4zOtPLt-5pYTjeVgrdczlPWlSqpY9XTF/exec"; // <--- 實作時請填入您的網址
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwzmoyqSBEL-C4SnzHsx9x03EWEn_gKR6XE4zOtPLt-5pYTjeVgrdczlPWlSqpY9XTF/exec";
         let scores = [];
         let currentInputCount = 0;
 
-        // --- 核心功能 ---
-
         async function fetchScores() {
             try {
-                // 模擬數據 (實作時改為 fetch(GAS_URL))
                 const res = await fetch(GAS_URL);
                 scores = await res.json();
                 renderPodium();
                 renderList();
+                document.getElementById('lastUpdate').innerText = `Synced at ${new Date().toLocaleTimeString()}`;
             } catch (err) {
-                console.error("Fetch Error:", err);
-                // 這裡可以放假數據測試
-                scores = [
-                    {name: "王小明", count: 88, title: "👑 義方金魚王"},
-                    {name: "設計師", count: 52, title: "🏅 夜市常客"},
-                    {name: "撈魚魔人", count: 45, title: "🏅 夜市常客"},
-                    {name: "路人甲", count: 12, title: "🎣 垂釣學徒"}
-                ];
-                renderPodium();
-                renderList();
+                console.error("Fetch Error", err);
             }
         }
 
         function renderPodium() {
-            const p1 = scores[0] || {name: "---", count: 0};
-            const p2 = scores[1] || {name: "---", count: 0};
-            const p3 = scores[2] || {name: "---", count: 0};
+            const items = scores.slice(0, 3);
+            const p1 = items[0] || {name: "---", count: 0};
+            const p2 = items[1] || {name: "---", count: 0};
+            const p3 = items[2] || {name: "---", count: 0};
 
-            // 設定名稱與數字
             document.getElementById('p1-name').innerText = p1.name;
             document.getElementById('p1-count').innerText = p1.count;
             document.getElementById('p2-name').innerText = p2.name;
@@ -191,48 +243,42 @@
             document.getElementById('p3-name').innerText = p3.name;
             document.getElementById('p3-count').innerText = p3.count;
 
-            // 設定高度 (最高 100%)
-            const max = p1.count || 1;
+            const max = Math.max(p1.count, 1);
             document.getElementById('p1-bar').style.height = '100%';
-            document.getElementById('p2-bar').style.height = `${(p2.count / max) * 80}%`;
-            document.getElementById('p3-bar').style.height = `${(p3.count / max) * 60}%`;
+            document.getElementById('p2-bar').style.height = `${(p2.count / max) * 75}%`;
+            document.getElementById('p3-bar').style.height = `${(p3.count / max) * 55}%`;
         }
 
         function renderList() {
             const listEl = document.getElementById('leaderboardList');
             listEl.innerHTML = "";
-            
-            // 從第 4 名開始顯示
             const others = scores.slice(3);
+
             if (others.length === 0) {
-                listEl.innerHTML = `<li class="text-center py-4 text-slate-500 italic">目前尚無更多挑戰者...</li>`;
+                listEl.innerHTML = `<li class="py-12 text-center text-slate-700 font-bold italic">目前尚無更多挑戰者數據...</li>`;
                 return;
             }
 
-            others.forEach((p, index) => {
+            others.forEach((p, idx) => {
                 const li = document.createElement('li');
-                li.className = "flex items-center justify-between bg-slate-800/50 p-4 rounded-lg border-l-4 border-slate-700";
+                li.className = "group flex items-center justify-between bg-slate-800/20 hover:bg-slate-800/40 p-6 rounded-2xl border border-slate-800 transition-all";
                 li.innerHTML = `
-                    <div class="flex items-center gap-4">
-                        <span class="text-slate-500 font-bold w-6">#${index + 4}</span>
+                    <div class="flex items-center gap-6">
+                        <span class="oswald text-2xl font-bold text-slate-600 w-8">0${idx + 4}</span>
                         <div>
-                            <div class="font-bold">${p.name}</div>
-                            <div class="text-xs text-slate-400">${p.title}</div>
+                            <div class="text-xl font-black text-slate-100 group-hover:text-cyan-400 transition-colors">${p.name}</div>
+                            <div class="text-xs font-bold uppercase tracking-widest text-slate-500">${p.title}</div>
                         </div>
                     </div>
-                    <div class="text-2xl font-black">${p.count}</div>
+                    <div class="text-3xl font-black oswald text-slate-400">${p.count}</div>
                 `;
                 listEl.appendChild(li);
             });
         }
 
-        // --- 互動功能 ---
-
         function toggleView(view) {
             document.getElementById('inputModal').classList.add('hidden');
-            if (view === 'input') {
-                document.getElementById('inputModal').classList.remove('hidden');
-            }
+            if (view === 'input') document.getElementById('inputModal').classList.remove('hidden');
         }
 
         function changeCount(val) {
@@ -243,33 +289,25 @@
         async function submitScore() {
             const name = document.getElementById('playerName').value || "無名大師";
             const btn = document.getElementById('btnSubmit');
-            
             btn.disabled = true;
             btn.innerText = "傳送中...";
 
             try {
-                const payload = {
-                    action: "ADD_SCORE",
-                    name: name,
-                    count: currentInputCount
-                };
-
                 await fetch(GAS_URL, {
                     method: 'POST',
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ action: "ADD_SCORE", name: name, count: currentInputCount })
                 });
 
-                // 檢查是否需要插播 (簡單邏輯：超過 50 隻或第一名)
                 if (currentInputCount >= 50 || (scores[0] && currentInputCount > scores[0].count)) {
                     triggerBroadcast(name, currentInputCount);
+                } else {
+                    alert("報分成功！");
+                    location.reload();
                 }
-
-                alert("報分成功！");
-                location.reload(); // 簡單起見直接刷新
             } catch (err) {
-                alert("送出失敗，請檢查網路！");
+                alert("網路異常！");
                 btn.disabled = false;
-                btn.innerText = "確認送出！";
+                btn.innerText = "確認送出";
             }
         }
 
@@ -279,22 +317,20 @@
             document.getElementById('b-count').innerText = count;
             
             let title = "🌊 觀浪者";
-            let heckle = "「只是來借廁所的吧？」";
-            if (count >= 100) { title = "👾 水缸終結者"; heckle = "「⚠️ 警報！水缸已被終結！老闆準備轉行！」"; }
-            else if (count >= 51) { title = "👑 新王登基"; heckle = "「 🎉 全場注意！新任金魚王誕生！後面的請排隊簽名。」"; }
+            let heckle = "只是來借廁所的吧？";
+            if (count >= 100) { title = "👾 水缸終結者"; heckle = "警報！水箱已爆裂，老闆準備轉行！"; }
+            else if (count >= 51) { title = "👑 義方金魚王"; heckle = "新王登基！全場尖叫聲！"; }
             
             document.getElementById('b-title').innerText = title;
             document.getElementById('b-heckle').innerText = heckle;
 
-            overlay.style.display = 'flex';
-            setTimeout(() => { overlay.style.display = 'none'; }, 7000);
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            setTimeout(() => { location.reload(); }, 6000);
         }
 
-        // 頁面加載後執行
         fetchScores();
-        // 每 30 秒自動更新一次
-        setInterval(fetchScores, 30000);
-
+        setInterval(fetchScores, 15000); // 縮短更新間隔至 15 秒
     </script>
 </body>
 </html>
