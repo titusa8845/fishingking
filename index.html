@@ -24,13 +24,12 @@
         
         @keyframes fillUp { from { height: 0; opacity: 0; } to { opacity: 1; } }
 
-        /* 領獎台容器 */
         .podium-container {
             display: flex;
             justify-content: center;
             align-items: flex-end;
             gap: 8px;
-            height: 480px; /* 固定容器高度 */
+            height: 480px;
             margin-bottom: 60px;
             padding: 0 10px;
         }
@@ -44,10 +43,9 @@
             transition: all 0.5s ease;
         }
 
-        /* 統一所有長條圖的最大容器高度，消除常態分佈感 */
         .bar-wrapper {
             width: 100%;
-            height: 350px; /* 所有名次共用相同的最大高度 */
+            height: 350px;
             position: relative;
             background: rgba(255, 255, 255, 0.02);
             border-top-left-radius: 8px;
@@ -58,7 +56,7 @@
 
         .bar-fill {
             width: 100%;
-            height: 0; /* JS 動態設定 */
+            height: 0;
             background: linear-gradient(to top, transparent, currentColor);
             box-shadow: 0 0 20px currentColor;
             animation: fillUp 2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
@@ -84,74 +82,53 @@
             margin-top: 10px;
         }
 
-        /* 霓虹發光類別 */
         .neon-1 { color: var(--neon-1); } .neon-2 { color: var(--neon-2); }
         .neon-3 { color: var(--neon-3); } .neon-4 { color: var(--neon-4); }
         .neon-5 { color: var(--neon-5); } .neon-6 { color: var(--neon-6); }
         .neon-7 { color: var(--neon-7); } .neon-8 { color: var(--neon-8); }
         .neon-9 { color: var(--neon-9); } .neon-10 { color: var(--neon-10); }
 
-        /* 動態背景魚群樣式 */
+        /* 第一名特別高光 - 修正位置 */
+        .rank-1-column .bar-fill {
+            filter: brightness(1.2);
+            box-shadow: 0 0 35px var(--neon-1);
+        }
+
         #fishBackground {
             position: fixed;
             inset: 0;
             z-index: -1;
             overflow: hidden;
             pointer-events: none;
-            opacity: 0.3; /* 調整背景透明度 */
+            opacity: 0.3;
         }
         .bg-fish {
             position: absolute;
             white-space: nowrap;
             user-select: none;
             will-change: transform;
-            transition: opacity 1s;
         }
-        @keyframes swimLeft {
-            from { transform: translateX(100vw); }
-            to { transform: translateX(-20vw); }
-        }
-        @keyframes swimRight {
-            from { transform: translateX(-20vw); }
-            to { transform: translateX(100vw); }
-        }
-        /* 輕微上下浮動效果 */
-        @keyframes bobbing {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-        </style>
-        </head>
-        <body class="p-2 md:p-6">
-        <!-- 背景魚群容器 -->
-        <div id="fishBackground"></div>
-            filter: brightness(1.2);
-            box-shadow: 0 0 30px var(--neon-1);
-        }
+        @keyframes swimLeft { from { transform: translateX(100vw); } to { transform: translateX(-20vw); } }
+        @keyframes swimRight { from { transform: translateX(-20vw); } to { transform: translateX(100vw); } }
+        @keyframes bobbing { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
     </style>
 </head>
 <body class="p-2 md:p-6">
+    <div id="fishBackground"></div>
 
     <div class="max-w-[1400px] mx-auto">
-        
         <header class="text-center mb-16">
             <h1 class="text-7xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 to-yellow-600 mb-4 italic tracking-tighter">義方金魚王</h1>
             <p class="text-cyan-400 font-bold tracking-[0.5em] text-xs uppercase">UX 夜市：及時戰況看板</p>
         </header>
 
-        <!-- 🏆 十人領獎台 (10-8-6-4-2-1-3-5-7-9) -->
-        <section id="podium" class="podium-container">
-            <!-- 由 JS 動態生成 -->
-        </section>
+        <section id="podium" class="podium-container"></section>
 
-        <!-- 📜 列表區 -->
         <section class="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 md:p-10 backdrop-blur-md mb-20">
             <h3 class="text-xl font-black mb-8 flex items-center gap-3">
                 <span class="w-1.5 h-6 bg-cyan-500 rounded-full"></span> 挑戰者名單 (11+)
             </h3>
-            <ul id="leaderboardList" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- 由 JS 動態生成 -->
-            </ul>
+            <ul id="leaderboardList" class="grid grid-cols-1 md:grid-cols-3 gap-4"></ul>
         </section>
 
         <footer class="flex justify-center gap-8 pb-20">
@@ -160,7 +137,7 @@
         </footer>
     </div>
 
-    <!-- [報分彈窗] -->
+    <!-- 📥 報分彈窗 -->
     <div id="inputModal" class="fixed inset-0 bg-black/95 hidden flex flex-col items-center justify-center p-6 z-[99999] backdrop-blur-2xl">
         <div class="w-full max-w-md text-center">
             <h2 class="text-4xl font-black mb-12 text-yellow-400">回報戰績</h2>
@@ -181,7 +158,7 @@
         </div>
     </div>
 
-    <!-- [管理員彈窗] -->
+    <!-- ⚙️ 管理員彈窗 -->
     <div id="adminModal" class="fixed inset-0 bg-slate-950/98 hidden flex flex-col items-center justify-center p-6 z-[99999] backdrop-blur-3xl">
         <div class="w-full max-w-lg">
             <h2 class="text-3xl font-black mb-10 text-center">⚙️ 管理系統</h2>
@@ -193,7 +170,7 @@
             <div id="adminPanel" class="hidden space-y-10">
                 <div class="bg-red-900/20 border border-red-500/30 p-10 rounded-[40px] text-center">
                     <h3 class="text-2xl font-bold text-red-400 mb-4">☢️ 危險操作</h3>
-                    <p class="text-slate-400 mb-8">確定要清空所有紀錄嗎？此動作無法復原！</p>
+                    <p class="text-slate-400 mb-8">確定要清空嗎？此動作無法復原！</p>
                     <button onclick="resetLeaderboard()" id="btnReset" class="bg-red-600 hover:bg-red-500 text-white font-black px-12 py-5 rounded-2xl text-xl shadow-2xl">一鍵清空所有紀錄</button>
                 </div>
                 <button onclick="toggleView('main')" class="w-full py-5 bg-slate-800 rounded-2xl font-bold text-slate-300">關閉面板</button>
@@ -201,7 +178,7 @@
         </div>
     </div>
 
-    <!-- [插播遮罩] -->
+    <!-- 📢 插播遮罩 -->
     <div id="broadcastOverlay" class="fixed inset-0 bg-black/98 hidden flex-col items-center justify-center p-6 text-center z-[100000]">
         <div class="animate-pulse mb-10 text-6xl font-black text-yellow-400 tracking-[0.6em]">NEW RECORD</div>
         <div class="bg-white/5 p-20 rounded-[60px] border border-white/10 shadow-2xl">
@@ -239,8 +216,6 @@
                 const data = scores[rank - 1] || { name: "---", count: 0 };
                 const column = document.createElement('div');
                 column.className = `podium-column ${rank === 1 ? 'rank-1-column scale-110 z-10' : ''}`;
-                
-                // 高度完全由數據驅動：(個人分數 / 第一名分數) * 100%
                 const fillHeight = (max === 0 || data.count === 0) ? 0 : (data.count / max) * 100;
 
                 column.innerHTML = `
@@ -254,8 +229,6 @@
                     <span class="rank-label neon-${rank}">${rank}</span>
                 `;
                 container.appendChild(column);
-
-                // 延遲觸發高度動畫，確保 CSS 動畫效果
                 setTimeout(() => {
                     const fill = document.getElementById(`bar-${rank}`);
                     if (fill) fill.style.height = `${fillHeight}%`;
@@ -267,12 +240,10 @@
             const listEl = document.getElementById('leaderboardList');
             listEl.innerHTML = "";
             const others = scores.slice(10);
-
             if (others.length === 0) {
                 listEl.innerHTML = `<li class="col-span-full py-10 text-center text-slate-700 italic font-bold">目前無更多挑戰者數據...</li>`;
                 return;
             }
-
             others.forEach((p, idx) => {
                 const li = document.createElement('li');
                 li.className = "flex items-center justify-between bg-slate-800/30 p-6 rounded-2xl border border-white/5 hover:bg-slate-800/50 transition-all";
@@ -340,42 +311,26 @@
         }
 
         fetchScores();
-        setInterval(fetchScores, 5000); // 縮短更新間隔至 5 秒，達到近乎即時的效果
+        setInterval(fetchScores, 5000);
 
-        // --- 背景魚群生成邏輯 ---
         const fishEmojis = ['🐟', '🐠', '🐡', '🐙', '🦑', '🦐', '🦀', '🦈', '🐋', '🐳', '🧜‍♂️', '🧜‍♀️'];
-        const bgContainer = document.getElementById('fishBackground');
-
         function createFish() {
             const fish = document.createElement('div');
             const emoji = fishEmojis[Math.floor(Math.random() * fishEmojis.length)];
             const direction = Math.random() > 0.5 ? 'right' : 'left';
-            const size = Math.floor(Math.random() * 30) + 20; // 20px - 50px
-            const duration = Math.floor(Math.random() * 15) + 10; // 10s - 25s
-            const top = Math.floor(Math.random() * 90); // 0% - 90% vertical
-            
+            const size = Math.floor(Math.random() * 30) + 20;
+            const duration = Math.floor(Math.random() * 15) + 10;
+            const top = Math.floor(Math.random() * 90);
             fish.className = 'bg-fish';
             fish.innerText = emoji;
             fish.style.fontSize = `${size}px`;
             fish.style.top = `${top}%`;
             fish.style.animation = `${direction === 'right' ? 'swimRight' : 'swimLeft'} ${duration}s linear forwards, bobbing 3s ease-in-out infinite`;
-            
-            // 如果是往左游，水平翻轉 Emoji
-            if (direction === 'left') {
-                fish.style.transform = 'scaleX(-1)';
-            }
-
-            bgContainer.appendChild(fish);
-
-            // 動畫結束後移除元素，節省效能
-            setTimeout(() => {
-                fish.remove();
-            }, duration * 1000);
+            if (direction === 'left') fish.style.transform = 'scaleX(-1)';
+            document.getElementById('fishBackground').appendChild(fish);
+            setTimeout(() => { fish.remove(); }, duration * 1000);
         }
-
-        // 每 2 秒生出一隻新的魚
         setInterval(createFish, 2000);
-        // 初始化先生成 5 隻
         for(let i=0; i<5; i++) setTimeout(createFish, Math.random() * 5000);
     </script>
 </body>
