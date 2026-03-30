@@ -84,15 +84,47 @@
             margin-top: 10px;
         }
 
-        /* 霓虹配色組 */
+        /* 霓虹發光類別 */
         .neon-1 { color: var(--neon-1); } .neon-2 { color: var(--neon-2); }
         .neon-3 { color: var(--neon-3); } .neon-4 { color: var(--neon-4); }
         .neon-5 { color: var(--neon-5); } .neon-6 { color: var(--neon-6); }
         .neon-7 { color: var(--neon-7); } .neon-8 { color: var(--neon-8); }
         .neon-9 { color: var(--neon-9); } .neon-10 { color: var(--neon-10); }
 
-        /* 第一名特別光暈 */
-        .rank-1-column .bar-fill {
+        /* 動態背景魚群樣式 */
+        #fishBackground {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+            opacity: 0.3; /* 調整背景透明度 */
+        }
+        .bg-fish {
+            position: absolute;
+            white-space: nowrap;
+            user-select: none;
+            will-change: transform;
+            transition: opacity 1s;
+        }
+        @keyframes swimLeft {
+            from { transform: translateX(100vw); }
+            to { transform: translateX(-20vw); }
+        }
+        @keyframes swimRight {
+            from { transform: translateX(-20vw); }
+            to { transform: translateX(100vw); }
+        }
+        /* 輕微上下浮動效果 */
+        @keyframes bobbing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        </style>
+        </head>
+        <body class="p-2 md:p-6">
+        <!-- 背景魚群容器 -->
+        <div id="fishBackground"></div>
             filter: brightness(1.2);
             box-shadow: 0 0 30px var(--neon-1);
         }
@@ -309,6 +341,42 @@
 
         fetchScores();
         setInterval(fetchScores, 5000); // 縮短更新間隔至 5 秒，達到近乎即時的效果
+
+        // --- 背景魚群生成邏輯 ---
+        const fishEmojis = ['🐟', '🐠', '🐡', '🐙', '🦑', '🦐', '🦀', '🦈', '🐋', '🐳', '🧜‍♂️', '🧜‍♀️'];
+        const bgContainer = document.getElementById('fishBackground');
+
+        function createFish() {
+            const fish = document.createElement('div');
+            const emoji = fishEmojis[Math.floor(Math.random() * fishEmojis.length)];
+            const direction = Math.random() > 0.5 ? 'right' : 'left';
+            const size = Math.floor(Math.random() * 30) + 20; // 20px - 50px
+            const duration = Math.floor(Math.random() * 15) + 10; // 10s - 25s
+            const top = Math.floor(Math.random() * 90); // 0% - 90% vertical
+            
+            fish.className = 'bg-fish';
+            fish.innerText = emoji;
+            fish.style.fontSize = `${size}px`;
+            fish.style.top = `${top}%`;
+            fish.style.animation = `${direction === 'right' ? 'swimRight' : 'swimLeft'} ${duration}s linear forwards, bobbing 3s ease-in-out infinite`;
+            
+            // 如果是往左游，水平翻轉 Emoji
+            if (direction === 'left') {
+                fish.style.transform = 'scaleX(-1)';
+            }
+
+            bgContainer.appendChild(fish);
+
+            // 動畫結束後移除元素，節省效能
+            setTimeout(() => {
+                fish.remove();
+            }, duration * 1000);
+        }
+
+        // 每 2 秒生出一隻新的魚
+        setInterval(createFish, 2000);
+        // 初始化先生成 5 隻
+        for(let i=0; i<5; i++) setTimeout(createFish, Math.random() * 5000);
     </script>
 </body>
 </html>
