@@ -32,7 +32,7 @@
             align-items: flex-end;
             gap: 10px;
             height: 450px;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
             padding: 0 10px;
             position: relative;
             z-index: 10;
@@ -42,13 +42,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: flex-end;
             width: 9%;
             min-width: 60px;
-            transition: all 0.5s ease;
-            /* 移除這裡的動畫，讓欄位固定 */
+            height: 100%;
         }
 
-        /* 只有長條圖本身搖擺 */
+        /* 只有長條圖本身搖擺，且確保底部對齊 */
         .bar-wrapper {
             width: 100%;
             height: 320px;
@@ -58,55 +58,23 @@
             border-top-right-radius: 25px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 3px solid rgba(255, 255, 255, 0.2); /* 底部強制對齊線 */
             backdrop-filter: blur(4px);
-            transform-origin: bottom center; /* 搖擺支點 */
+            transform-origin: center bottom; /* 確保支點在底部中央 */
             animation: seaweedSway 4s ease-in-out infinite;
         }
 
-        /* 讓不同名次的水藻晃動錯開 */
-        .rank-column-2 .bar-wrapper { animation-delay: -1s; animation-duration: 5s; }
-        .rank-column-3 .bar-wrapper { animation-delay: -2s; animation-duration: 6s; }
-        .rank-column-4 .bar-wrapper { animation-delay: -1.5s; }
-        .rank-column-1 .bar-wrapper { animation-duration: 4.5s; }
-
-        @keyframes seaweedSway {
-            0%, 100% { transform: rotate(-2deg) skewX(-1deg); }
-            50% { transform: rotate(2deg) skewX(1deg); }
-        }
-
-        .bar-fill {
-            width: 100%;
-            height: 0;
-            background: linear-gradient(to top, rgba(255,255,255,0.15), currentColor);
-            box-shadow: 0 0 25px currentColor;
-            animation: fillUp 2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-            position: absolute; bottom: 0;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-        }
-
-        /* 氣泡能量上升特效 */
-        .bar-fill::after {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background-image: radial-gradient(circle, rgba(255,255,255,0.5) 15%, transparent 15%);
-            background-size: 25px 40px;
-            animation: bubbleRise 3s infinite linear;
-            opacity: 0.4;
-        }
-
-        @keyframes bubbleRise {
-            0% { background-position: 0 100%; }
-            100% { background-position: 0 0%; }
-        }
-
+        /* 固定高度的名次標籤 */
         .rank-label {
             font-family: 'Oswald', sans-serif;
             font-size: 2rem;
             font-weight: 900;
             opacity: 0.2;
-            margin-top: 5px;
-            /* 固定不動 */
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
         }
 
         .neon-1 { color: var(--neon-1); } .neon-2 { color: var(--neon-2); }
