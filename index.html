@@ -36,7 +36,6 @@
             padding: 0 10px;
             position: relative;
             z-index: 10;
-            perspective: 1000px;
         }
 
         .podium-column {
@@ -46,29 +45,33 @@
             width: 9%;
             min-width: 60px;
             transition: all 0.5s ease;
-            transform-origin: bottom center; /* 搖擺點在底部 */
-            animation: seaweedSway 4s ease-in-out infinite; /* 水藻搖擺動畫 */
+            /* 移除這裡的動畫，讓欄位固定 */
         }
 
-        /* 讓晃動錯開 */
-        .podium-column:nth-child(2n) { animation-delay: -1s; animation-duration: 5s; }
-        .podium-column:nth-child(3n) { animation-delay: -2s; animation-duration: 6s; }
-
-        @keyframes seaweedSway {
-            0%, 100% { transform: rotate(-2deg) skewX(-1deg); }
-            50% { transform: rotate(2deg) skewX(1deg); }
-        }
-
+        /* 只有長條圖本身搖擺 */
         .bar-wrapper {
             width: 100%;
             height: 320px;
             position: relative;
             background: rgba(255, 255, 255, 0.03);
-            border-top-left-radius: 25px; /* 圓潤的水藻頭 */
+            border-top-left-radius: 25px;
             border-top-right-radius: 25px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(4px);
+            transform-origin: bottom center; /* 搖擺支點 */
+            animation: seaweedSway 4s ease-in-out infinite;
+        }
+
+        /* 讓不同名次的水藻晃動錯開 */
+        .rank-column-2 .bar-wrapper { animation-delay: -1s; animation-duration: 5s; }
+        .rank-column-3 .bar-wrapper { animation-delay: -2s; animation-duration: 6s; }
+        .rank-column-4 .bar-wrapper { animation-delay: -1.5s; }
+        .rank-column-1 .bar-wrapper { animation-duration: 4.5s; }
+
+        @keyframes seaweedSway {
+            0%, 100% { transform: rotate(-2deg) skewX(-1deg); }
+            50% { transform: rotate(2deg) skewX(1deg); }
         }
 
         .bar-fill {
@@ -82,14 +85,12 @@
             border-top-right-radius: 20px;
         }
 
-        /* 由下往上的氣泡能量注入特效 */
+        /* 氣泡能量上升特效 */
         .bar-fill::after {
             content: '';
-            position: absolute; 
-            top: 0; left: 0; right: 0; bottom: 0;
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background-image: radial-gradient(circle, rgba(255,255,255,0.5) 15%, transparent 15%);
-            background-size: 25px 40px; /* 控制氣泡間距 */
-            background-position: 0 0;
+            background-size: 25px 40px;
             animation: bubbleRise 3s infinite linear;
             opacity: 0.4;
         }
@@ -105,6 +106,7 @@
             font-weight: 900;
             opacity: 0.2;
             margin-top: 5px;
+            /* 固定不動 */
         }
 
         .neon-1 { color: var(--neon-1); } .neon-2 { color: var(--neon-2); }
@@ -115,31 +117,64 @@
 
         .rank-1-column .bar-fill { filter: brightness(1.3); box-shadow: 0 0 45px var(--neon-1); }
 
-        /* --- 動態海洋與海浪 --- */
+        /* --- 動態海洋背景 --- */
         #fishBackground { position: fixed; inset: 0; z-index: -2; overflow: hidden; pointer-events: none; }
         .bg-fish { position: absolute; white-space: nowrap; user-select: none; opacity: 0.5; will-change: transform; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3)); }
         @keyframes swimLeft { from { transform: translateX(110vw) scaleX(-1); } to { transform: translateX(-20vw) scaleX(-1); } }
         @keyframes swimRight { from { transform: translateX(-20vw); } to { transform: translateX(110vw); } }
         @keyframes bobbing { 0%, 100% { margin-top: 0; } 50% { margin-top: -15px; } }
 
-        .wave-wrapper { position: fixed; bottom: 0; width: 100%; height: 120px; z-index: -1; overflow: hidden; pointer-events: none; }
-        .wave { position: absolute; bottom: 0; left: 0; width: 200%; height: 100%; background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg"><path d="M0 0c100 0 200 50 300 50s200-50 300-50 200 50 300 50 200-50 300-50v70H0V0z" fill="%230ea5e9" fill-opacity="0.4"/></svg>') repeat-x; background-size: 50% 100%; animation: waveMove 12s linear infinite; }
-        .wave2 { animation: waveMove 18s linear infinite; height: 80%; opacity: 0.6; }
-        .wave3 { animation: waveMove 25s linear infinite; height: 60%; }
-        @keyframes waveMove { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        /* --- 恢復經典 SVG 海浪 --- */
+        .wave-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .waves {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .parallax > use {
+            animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite;
+        }
+        .parallax > use:nth-child(1) { animation-delay: -2s; animation-duration: 7s; }
+        .parallax > use:nth-child(2) { animation-delay: -3s; animation-duration: 10s; }
+        .parallax > use:nth-child(3) { animation-delay: -4s; animation-duration: 13s; }
+        .parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 20s; }
+
+        @keyframes move-forever {
+            0% { transform: translate3d(-90px,0,0); }
+            100% { transform: translate3d(85px,0,0); }
+        }
     </style>
 </head>
 <body>
     <div id="fishBackground"></div>
-    <div class="wave-wrapper">
-        <div class="wave wave1"></div>
-        <div class="wave wave2" style="bottom: -10px;"></div>
-        <div class="wave wave3" style="bottom: -20px;"></div>
+    
+    <!-- 經典 SVG 海浪 -->
+    <div class="wave-container">
+        <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+        viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+            <defs>
+                <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+            </defs>
+            <g class="parallax">
+                <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(14, 165, 233, 0.3)" />
+                <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(14, 165, 233, 0.5)" />
+                <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(14, 165, 233, 0.7)" />
+                <use xlink:href="#gentle-wave" x="48" y="7" fill="#0ea5e9" />
+            </g>
+        </svg>
     </div>
 
     <div class="max-w-[1400px] mx-auto p-4">
         <header class="text-center mt-8 mb-10">
-            <h1 class="text-7xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 to-yellow-500 mb-2 italic tracking-tighter drop-shadow-2xl">義方金魚王</h1>
+            <h1 class="text-7xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 to-yellow-500 mb-2 italic tracking-tighter drop-shadow-2xl text-white">義方金魚王</h1>
             <p class="text-cyan-300 font-bold tracking-[0.4em] text-3xl uppercase">及時戰況看板</p>
         </header>
 
@@ -158,7 +193,7 @@
         </footer>
     </div>
 
-    <!-- 彈窗內容保持完整 (報分, 管理, 插播) -->
+    <!-- 報分彈窗, 管理彈窗, 插播遮罩保持完整 -->
     <div id="inputModal" class="fixed inset-0 bg-black/90 hidden flex flex-col items-center justify-center p-6 z-[1000] backdrop-blur-2xl">
         <div class="w-full max-w-lg text-center">
             <h2 class="text-5xl font-black mb-12 text-yellow-400">回報戰績</h2>
@@ -233,7 +268,7 @@
             podiumOrder.forEach(rank => {
                 const data = scores[rank - 1] || { name: "---", count: 0 };
                 const column = document.createElement('div');
-                column.className = `podium-column ${rank === 1 ? 'rank-1-column scale-110 z-10' : ''}`;
+                column.className = `podium-column rank-column-${rank} ${rank === 1 ? 'rank-1-column scale-110 z-10' : ''}`;
                 const fillHeight = (max === 0 || data.count === 0) ? 0 : (data.count / max) * 100;
 
                 column.innerHTML = `
