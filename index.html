@@ -122,15 +122,15 @@
         </footer>
     </div>
 
-    <!-- [報分彈窗] 保持不變 -->
+    <!-- 📥 報分彈窗 -->
     <div id="inputModal" class="fixed inset-0 bg-black/95 hidden flex flex-col items-center justify-center p-6 z-[99999] backdrop-blur-2xl">
         <div class="w-full max-w-md text-center">
             <h2 class="text-4xl font-black mb-10 text-yellow-400">回報戰績</h2>
             <input type="text" id="playerName" placeholder="你的暱稱" class="bg-slate-800 border-2 border-slate-700 p-6 rounded-2xl w-full text-center text-2xl mb-8 outline-none focus:border-cyan-500">
             <div class="flex items-center justify-center gap-8 mb-10">
-                <button onclick="changeCount(-1)" class="w-16 h-16 bg-slate-800 rounded-full text-3xl font-bold">-</button>
+                <button onclick="changeCount(-1)" class="w-16 h-16 bg-slate-800 rounded-full text-4xl font-bold">-</button>
                 <span id="currentCount" class="oswald text-7xl font-black min-w-[120px] text-cyan-400">0</span>
-                <button onclick="changeCount(1)" class="w-16 h-16 bg-slate-800 rounded-full text-3xl font-bold">+</button>
+                <button onclick="changeCount(1)" class="w-16 h-16 bg-slate-800 rounded-full text-4xl font-bold">+</button>
             </div>
             <div class="flex gap-4 mb-8">
                 <button onclick="changeCount(10)" class="bg-slate-800 flex-1 py-3 rounded-lg font-bold text-lg">+10</button>
@@ -139,6 +139,30 @@
             <div class="flex flex-col gap-4">
                 <button onclick="submitScore()" id="btnSubmit" class="bg-yellow-500 text-slate-950 font-black py-5 rounded-xl text-xl">確認送出</button>
                 <button onclick="toggleView('main')" class="text-slate-500 font-bold py-3">返回主頁</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⚙️ 管理員彈窗 -->
+    <div id="adminModal" class="fixed inset-0 bg-slate-950/98 hidden flex flex-col items-center justify-center p-6 z-[99999] backdrop-blur-3xl">
+        <div class="w-full max-w-lg">
+            <h2 class="text-3xl font-black mb-8 text-center">⚙️ 管理系統</h2>
+            
+            <!-- 密碼輸入區 -->
+            <div id="adminAuth" class="text-center">
+                <input type="password" id="adminPass" placeholder="輸入管理密碼" class="bg-slate-800 border-2 border-slate-700 p-4 rounded-xl w-full text-center text-xl mb-6 outline-none">
+                <button onclick="verifyAdmin()" class="bg-cyan-600 px-8 py-3 rounded-xl font-bold">進入管理面板</button>
+                <button onclick="toggleView('main')" class="block mx-auto mt-6 text-slate-500">取消</button>
+            </div>
+
+            <!-- 功能面板 (初始隱藏) -->
+            <div id="adminPanel" class="hidden space-y-8">
+                <div class="bg-red-900/20 border border-red-500/30 p-8 rounded-3xl text-center">
+                    <h3 class="text-xl font-bold text-red-400 mb-4">危險區域 (Dangerous)</h3>
+                    <p class="text-sm text-slate-400 mb-6">點擊下方按鈕將會「永久清空」所有排行榜數據，請謹慎操作！</p>
+                    <button onclick="resetLeaderboard()" id="btnReset" class="bg-red-600 hover:bg-red-500 text-white font-black px-10 py-4 rounded-xl shadow-lg transition-all">一鍵清空所有紀錄 ☢️</button>
+                </div>
+                <button onclick="toggleView('main')" class="w-full py-4 bg-slate-800 rounded-xl font-bold text-slate-300">關閉管理面板</button>
             </div>
         </div>
     </div>
@@ -234,7 +258,53 @@
 
         function toggleView(view) {
             document.getElementById('inputModal').classList.add('hidden');
+            document.getElementById('adminModal').classList.add('hidden');
+            
             if (view === 'input') document.getElementById('inputModal').classList.remove('hidden');
+            if (view === 'admin') {
+                document.getElementById('adminModal').classList.remove('hidden');
+                document.getElementById('adminAuth').classList.remove('hidden');
+                document.getElementById('adminPanel').classList.add('hidden');
+                document.getElementById('adminPass').value = "";
+            }
+        }
+
+        function verifyAdmin() {
+            const pass = document.getElementById('adminPass').value;
+            if (pass === "1234") { // 與 GAS 內的 ADMIN_KEY 一致
+                document.getElementById('adminAuth').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+            } else {
+                alert("密碼錯誤！");
+            }
+        }
+
+        async function resetLeaderboard() {
+            if (!confirm("☢️ 警告：確定要清空所有紀錄嗎？此動作無法復原！")) return;
+            
+            const btn = document.getElementById('btnReset');
+            const pass = document.getElementById('adminPass').value;
+            btn.disabled = true;
+            btn.innerText = "正在核平處理中...";
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: "RESET", key: pass })
+                });
+                const result = await res.text();
+                if (result === "RESET_SUCCESS") {
+                    alert("💥 排行榜已清空！");
+                    location.reload();
+                } else {
+                    alert("重置失敗：" + result);
+                }
+            } catch (err) {
+                alert("網路異常");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "一鍵清空所有紀錄 ☢️";
+            }
         }
 
         function changeCount(val) {
