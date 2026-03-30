@@ -48,7 +48,7 @@
             height: 100%;
         }
 
-        /* 只有長條圖本身搖擺，且確保底部對齊 */
+        /* 只有長條圖本身搖擺 */
         .bar-wrapper {
             width: 100%;
             height: 320px;
@@ -58,13 +58,49 @@
             border-top-right-radius: 25px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-bottom: 3px solid rgba(255, 255, 255, 0.2); /* 底部強制對齊線 */
+            border-bottom: 3px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(4px);
-            transform-origin: center bottom; /* 確保支點在底部中央 */
+            transform-origin: center bottom;
             animation: seaweedSway 4s ease-in-out infinite;
         }
 
-        /* 固定高度的名次標籤 */
+        /* 讓晃動錯開 */
+        .rank-column-2 .bar-wrapper { animation-delay: -1s; animation-duration: 5s; }
+        .rank-column-3 .bar-wrapper { animation-delay: -2s; animation-duration: 6s; }
+
+        @keyframes seaweedSway {
+            0%, 100% { transform: rotate(-2deg) skewX(-1deg); }
+            50% { transform: rotate(2deg) skewX(1deg); }
+        }
+
+        /* 修正：恢復長條圖填充樣式 */
+        .bar-fill {
+            width: 100%;
+            height: 0;
+            background: linear-gradient(to top, rgba(255,255,255,0.15), currentColor);
+            box-shadow: 0 0 25px currentColor;
+            animation: fillUp 2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+            position: absolute; bottom: 0;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+
+        /* 氣泡能量上升特效 */
+        .bar-fill::after {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.5) 15%, transparent 15%);
+            background-size: 25px 40px;
+            animation: bubbleRise 3s infinite linear;
+            opacity: 0.4;
+        }
+
+        @keyframes bubbleRise {
+            0% { background-position: 0 100%; }
+            100% { background-position: 0 0%; }
+        }
+
+        /* 固定名次標籤 */
         .rank-label {
             font-family: 'Oswald', sans-serif;
             font-size: 2rem;
@@ -85,52 +121,30 @@
 
         .rank-1-column .bar-fill { filter: brightness(1.3); box-shadow: 0 0 45px var(--neon-1); }
 
-        /* --- 動態海洋背景 --- */
+        /* --- 動態海洋與海浪 --- */
         #fishBackground { position: fixed; inset: 0; z-index: -2; overflow: hidden; pointer-events: none; }
         .bg-fish { position: absolute; white-space: nowrap; user-select: none; opacity: 0.5; will-change: transform; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3)); }
         @keyframes swimLeft { from { transform: translateX(110vw) scaleX(-1); } to { transform: translateX(-20vw) scaleX(-1); } }
         @keyframes swimRight { from { transform: translateX(-20vw); } to { transform: translateX(110vw); } }
         @keyframes bobbing { 0%, 100% { margin-top: 0; } 50% { margin-top: -15px; } }
 
-        /* --- 恢復經典 SVG 海浪 --- */
-        .wave-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 120px;
-            z-index: -1;
-            pointer-events: none;
-        }
-        .waves {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-        .parallax > use {
-            animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite;
-        }
+        /* --- 經典 SVG 海浪 --- */
+        .wave-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 120px; z-index: -1; pointer-events: none; }
+        .waves { position: relative; width: 100%; height: 100%; }
+        .parallax > use { animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite; }
         .parallax > use:nth-child(1) { animation-delay: -2s; animation-duration: 7s; }
         .parallax > use:nth-child(2) { animation-delay: -3s; animation-duration: 10s; }
         .parallax > use:nth-child(3) { animation-delay: -4s; animation-duration: 13s; }
         .parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 20s; }
-
-        @keyframes move-forever {
-            0% { transform: translate3d(-90px,0,0); }
-            100% { transform: translate3d(85px,0,0); }
-        }
+        @keyframes move-forever { 0% { transform: translate3d(-90px,0,0); } 100% { transform: translate3d(85px,0,0); } }
     </style>
 </head>
 <body>
     <div id="fishBackground"></div>
-    
-    <!-- 經典 SVG 海浪 -->
     <div class="wave-container">
         <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
         viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
-            <defs>
-                <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
-            </defs>
+            <defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" /></defs>
             <g class="parallax">
                 <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(14, 165, 233, 0.3)" />
                 <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(14, 165, 233, 0.5)" />
@@ -161,7 +175,7 @@
         </footer>
     </div>
 
-    <!-- 報分彈窗, 管理彈窗, 插播遮罩保持完整 -->
+    <!-- 彈窗內容 (保持完整) -->
     <div id="inputModal" class="fixed inset-0 bg-black/90 hidden flex flex-col items-center justify-center p-6 z-[1000] backdrop-blur-2xl">
         <div class="w-full max-w-lg text-center">
             <h2 class="text-5xl font-black mb-12 text-yellow-400">回報戰績</h2>
@@ -184,7 +198,7 @@
 
     <div id="adminModal" class="fixed inset-0 bg-black/95 hidden flex flex-col items-center justify-center p-6 z-[1000] backdrop-blur-3xl">
         <div class="w-full max-w-xl text-center">
-            <h2 class="text-4xl font-black mb-12">⚙️ 管理系統</h2>
+            <h2 class="text-4xl font-black mb-12 text-center">⚙️ 管理系統</h2>
             <div id="adminAuth">
                 <input type="password" id="adminPass" placeholder="輸入密碼" class="bg-slate-800 border-2 border-slate-700 p-6 rounded-2xl w-full text-center text-3xl mb-10 outline-none text-white">
                 <button onclick="verifyAdmin()" class="bg-cyan-600 px-16 py-5 rounded-2xl font-bold text-2xl">進入面板</button>
@@ -302,7 +316,7 @@
             try {
                 const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET", key: document.getElementById('adminPass').value }) });
                 if (await res.text() === "RESET_SUCCESS") { alert("已重置！"); location.reload(); }
-            } catch (err) { alert("失敗"); }
+            } catch (err) { alert("重置失敗"); }
         }
 
         function changeCount(val) { currentInputCount = Math.max(0, currentInputCount + val); document.getElementById('currentCount').innerText = currentInputCount; }
@@ -315,7 +329,7 @@
                 await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "ADD_SCORE", name: name, count: currentInputCount }) });
                 if (currentInputCount >= 50 || (scores[0] && currentInputCount > scores[0].count)) { triggerBroadcast(name, currentInputCount); }
                 else { alert("回報成功！"); location.reload(); }
-            } catch (err) { alert("錯誤"); btn.disabled = false; btn.innerText = "確認送出"; }
+            } catch (err) { alert("失敗"); btn.disabled = false; btn.innerText = "確認送出"; }
         }
 
         function triggerBroadcast(name, count) {
