@@ -48,32 +48,29 @@
             height: 100%;
         }
 
-        /* 只有長條圖本身搖擺 */
+        /* 只有長條圖本身，取消搖擺 */
         .bar-wrapper {
             width: 100%;
             height: 320px;
             position: relative;
             background: rgba(255, 255, 255, 0.03);
-            border-top-left-radius: 25px;
-            border-top-right-radius: 25px;
+            border-top-left-radius: 12px; /* 稍微收斂，更具能量電池感 */
+            border-top-right-radius: 12px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-bottom: 3px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(4px);
-            transform-origin: center bottom;
-            animation: seaweedSway 4s ease-in-out infinite;
+            /* 移除 animation: seaweedSway */
         }
 
-        /* 讓晃動錯開 */
-        .rank-column-2 .bar-wrapper { animation-delay: -1s; animation-duration: 5s; }
-        .rank-column-3 .bar-wrapper { animation-delay: -2s; animation-duration: 6s; }
-
-        @keyframes seaweedSway {
-            0%, 100% { transform: rotate(-2deg) skewX(-1deg); }
-            50% { transform: rotate(2deg) skewX(1deg); }
+        /* 移除原有的晃動錯開設定 */
+        .rank-column-2 .bar-wrapper, 
+        .rank-column-3 .bar-wrapper, 
+        .rank-column-4 .bar-wrapper, 
+        .rank-column-1 .bar-wrapper { 
+            animation: none; 
         }
 
-        /* 修正：恢復長條圖填充樣式 */
         .bar-fill {
             width: 100%;
             height: 0;
@@ -81,8 +78,8 @@
             box-shadow: 0 0 25px currentColor;
             animation: fillUp 2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
             position: absolute; bottom: 0;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
         }
 
         /* 氣泡能量上升特效 */
