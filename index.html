@@ -1038,18 +1038,13 @@
 
                 // 只在數據確實改變時渲染（避免閃爍）
                 if (JSON.stringify(data) !== JSON.stringify(scores)) {
-                    // 🔬 探針 A：資料確實有變動
-                    console.group(`🔬 [探針A] 資料變動！筆數 ${scores.length}→${data.length}`);
-                    console.log('lastSubmitted =', lastSubmitted);
-                    console.groupEnd();
-                    showToast(`📡 資料更新（lastSubmitted=${lastSubmitted ? lastSubmitted.name : 'null'}）`, 'info');
+                    const newRanked = [...data].sort((a, b) => b.count - a.count);
 
-                    // 在數據更新前，計算排名變動並決定是否觸發獎牌卡
+                    // 在數據更新前，計算排名變動並決定是否觸發事件
                     if (lastSubmitted) {
+                        // ── 路徑 1：本人剛提交，用 lastSubmitted 精確比對 ──
                         console.log(`🔍 [事件追蹤] lastSubmitted: ${lastSubmitted.name} (${lastSubmitted.count}隻)`);
-                        const newRanked = [...data].sort((a, b) => b.count - a.count);
 
-                        // 用名字找（不限 count，因為同名玩家可能有多筆，取最新那筆）
                         const newRankIdx = newRanked.findIndex(p =>
                             p.name === lastSubmitted.name && p.count === lastSubmitted.count
                         );
@@ -1082,24 +1077,15 @@
                             const playerName = playerData.name;
                             const playerCount = playerData.count;
 
-                            // 優先順序 1：登上第一名
                             if (isRank1Entry) {
                                 eventMessage = `🎙️ 主播：${playerName} 登上王座！目前 ${playerCount} 隻！這是義方金魚王嗎？！`;
-                            }
-                            // 優先順序 2：進入前 3 名
-                            else if (isTop3Entry) {
+                            } else if (isTop3Entry) {
                                 eventMessage = `👥 觀眾：${playerName} 殺進前三名！！！`;
-                            }
-                            // 優先順序 3：超車（排名提升）
-                            else if (hasRankUp) {
+                            } else if (hasRankUp) {
                                 eventMessage = `🎙️ 主播：${playerName} 超車了！從第 ${prevRank} 名衝到第 ${newRank} 名！`;
-                            }
-                            // 優先順序 4：新人擠進前 10
-                            else if (isTop10Entry) {
+                            } else if (isTop10Entry) {
                                 eventMessage = `🎙️ 主播：${playerName} 剛剛殺進前十！帶著 ${playerCount} 隻魚！`;
-                            }
-                            // 優先順序 5：保底——任何提交都廣播（已在排名中的玩家更新分數）
-                            else {
+                            } else {
                                 const title = calculateTitle(playerCount);
                                 if (newRank === 1) {
                                     eventMessage = `👑 ${playerName} 繼續稱霸第一！${playerCount} 隻！${title}！`;
@@ -1111,31 +1097,62 @@
                             }
 
                             console.log(`🎙️ [事件追蹤] eventMessage="${eventMessage}"`);
-                            // 有事件訊息時：跑馬燈 + 醒目插播橫幅（頂端滑入）
                             if (eventMessage) {
                                 const bannerMsg = eventMessage; // 先存，rotateMessage 內會清掉 eventMessage
-                                // 🔬 探針 B：即將觸發 triggerEventBanner
-                                showToast(`🎙️ 探針B：banner 即將插播！`, 'success');
-                                console.log(`🔬 [探針B] 呼叫 triggerEventBanner("${bannerMsg}")`);
                                 rotateMessage();
                                 scheduleBroadcast();
                                 triggerEventBanner(bannerMsg);
-                            } else {
-                                // 🔬 探針 C：eventMessage 是 null（不該走到這裡）
-                                showToast(`⚠️ 探針C：eventMessage 為 null，沒有插播`, 'error');
-                                console.warn(`🔬 [探針C] eventMessage 是 null，banner 不會出現`);
                             }
                         } else {
-                            // 🔬 探針 D：玩家尚未出現在 GAS 數據
-                            showToast(`⏳ 探針D：GAS 尚未寫入，等下輪`, 'info');
                             console.log(`⏳ [事件追蹤] 玩家尚未出現在數據，下輪再試`);
                         }
                         // newRank === 0 代表 GAS 尚未寫入，保留 lastSubmitted 等下一輪輪詢
-                    } else {
-                        // 🔬 探針 E：資料有變但不是本人提交（lastSubmitted=null）← 這才是問題所在！
-                        const newRanked = [...data].sort((a, b) => b.count - a.count);
-                        showToast(`📊 探針E：別人提交！lastSubmitted=null，動態事件不觸發`, 'error');
-                        console.warn(`🔬 [探針E] lastSubmitted=null，排名變動偵測跳過。新第1名：${newRanked[0]?.name}(${newRanked[0]?.count}隻)`);
+                    } else if (previousRanked.length > 0) {
+                        // ── 路徑 2：輪詢抓到別人的提交，比對排名快照偵測最顯著變動 ──
+                        let detectedMsg = null;
+                        let topPriority = 0; // 數字越大優先越高
+
+                        newRanked.forEach((p, newIdx) => {
+                            const newRank = newIdx + 1;
+                            const prevIdx = previousRanked.findIndex(pp => pp.name === p.name);
+                            const prevRank = prevIdx === -1 ? 999 : prevIdx + 1;
+
+                            const isRank1Entry = newRank === 1 && prevRank !== 1;
+                            const isTop3Entry  = newRank <= 3  && prevRank > 3;
+                            const isTop10Entry = newRank <= 10 && prevRank > 10;
+                            const hasRankUp    = prevRank !== 999 && newRank < prevRank;
+
+                            let msg = null;
+                            let priority = 0;
+
+                            if (isRank1Entry) {
+                                msg = `🎙️ 主播：${p.name} 登上王座！目前 ${p.count} 隻！這是義方金魚王嗎？！`;
+                                priority = 4;
+                            } else if (isTop3Entry) {
+                                msg = `👥 觀眾：${p.name} 殺進前三名！！！`;
+                                priority = 3;
+                            } else if (isTop10Entry) {
+                                msg = `🎙️ 主播：${p.name} 剛剛殺進前十！帶著 ${p.count} 隻魚！`;
+                                priority = 2;
+                            } else if (hasRankUp && newRank <= 10) {
+                                msg = `🎙️ 主播：${p.name} 超車了！從第 ${prevRank} 名衝到第 ${newRank} 名！`;
+                                priority = 1;
+                            }
+
+                            if (msg && priority > topPriority) {
+                                topPriority = priority;
+                                detectedMsg = msg;
+                            }
+                        });
+
+                        if (detectedMsg) {
+                            console.log(`🎙️ [輪詢事件] 偵測到排名變動：${detectedMsg}`);
+                            eventMessage = detectedMsg;
+                            const bannerMsg = eventMessage;
+                            rotateMessage();
+                            scheduleBroadcast();
+                            triggerEventBanner(bannerMsg);
+                        }
                     }
 
                     scores = data;
@@ -1726,22 +1743,6 @@
             const banner = document.getElementById('eventBanner');
             const inner  = document.getElementById('eventBannerInner');
             const text   = document.getElementById('eventBannerText');
-
-            // 🔬 探針 F：確認 DOM 元素存在
-            console.group(`🔬 [探針F] triggerEventBanner 呼叫`);
-            console.log('msg =', msg);
-            console.log('banner DOM =', banner);
-            console.log('inner DOM =', inner);
-            console.log('text  DOM =', text);
-            if (!banner || !inner || !text) {
-                console.error('🔬 [探針F] ❌ DOM 元素不存在！banner 無法顯示');
-                showToast(`❌ 探針F：DOM 找不到 eventBanner！`, 'error');
-                console.groupEnd();
-                return;
-            }
-            console.log('🔬 [探針F] ✅ DOM 元素都找到，繼續執行');
-            console.groupEnd();
-            showToast(`🎙️ 探針F：banner 正在顯示「${msg.substring(0,15)}…」`, 'success');
 
             // 清掉上一次還沒消失的
             clearTimeout(eventBannerTimeout);
