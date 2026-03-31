@@ -475,20 +475,40 @@
     </div>
 
     <!-- 彈窗內容 (保持完整) -->
-    <div id="inputModal" class="fixed inset-0 bg-black/90 hidden flex flex-col items-center justify-center p-6 z-[1000] backdrop-blur-2xl">
-        <div class="w-full max-w-lg text-center">
-            <h2 class="text-5xl font-black mb-12 text-yellow-400">回報戰績</h2>
-            <input type="text" id="playerName" placeholder="你的暱稱 (最多8字)" maxlength="8" class="bg-slate-800 border-4 border-slate-700 p-8 rounded-3xl w-full text-center text-4xl mb-12 outline-none focus:border-cyan-400 text-white font-bold">
-            <div class="flex items-center justify-center gap-12 mb-12">
-                <button onclick="changeCount(-1)" class="w-24 h-24 bg-slate-700 rounded-full text-6xl font-bold">-</button>
-                <span id="currentCount" class="oswald text-9xl font-black min-w-[200px] text-cyan-400">0</span>
-                <button onclick="changeCount(1)" class="w-24 h-24 bg-slate-700 rounded-full text-6xl font-bold">+</button>
+    <div id="inputModal" class="fixed inset-0 bg-black/90 hidden flex flex-col items-center justify-center p-6 z-[1000] backdrop-blur-2xl overflow-y-auto">
+        <div class="w-full max-w-2xl text-center py-8">
+            <h2 class="text-5xl font-black mb-8 text-yellow-400">回報戰績</h2>
+
+            <!-- 班級選擇或學生選擇區域 -->
+            <div id="classSelectionView" class="mb-12">
+                <p class="text-2xl text-cyan-300 mb-6 font-bold">選擇班級</p>
+                <div id="classCardsContainer" class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8"></div>
+                <button onclick="selectAnonymous()" class="w-full bg-slate-700 text-slate-300 font-bold py-4 rounded-2xl text-xl hover:bg-slate-600 transition-all">匿名送出</button>
             </div>
-            <div class="flex flex-col gap-6">
-                <button onclick="submitScore()" id="btnSubmit" class="bg-yellow-500 text-slate-950 font-black py-8 rounded-[30px] text-4xl shadow-2xl active:scale-95">確認送出</button>
-                <button onclick="clearInput()" class="bg-slate-700 text-slate-300 font-bold py-6 rounded-2xl text-2xl hover:bg-slate-600 transition-all active:scale-95">🗑️ 清空輸入</button>
-                <button onclick="toggleView('main')" class="text-slate-400 font-bold text-2xl py-4">返回主頁</button>
+
+            <div id="studentSelectionView" class="mb-12 hidden">
+                <button onclick="backToClassSelection()" class="text-cyan-400 font-bold text-lg mb-6 hover:text-cyan-300">← 回上一步</button>
+                <p id="selectedClassLabel" class="text-2xl text-cyan-300 mb-6 font-bold"></p>
+                <div id="studentCardsContainer" class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8 max-h-96 overflow-y-auto"></div>
             </div>
+
+            <!-- 已選擇/計數區域 -->
+            <div id="scoreInputView" class="hidden">
+                <p id="selectedStudentDisplay" class="text-3xl text-cyan-300 font-bold mb-8"></p>
+                <div class="flex items-center justify-center gap-12 mb-12">
+                    <button onclick="changeCount(-1)" class="w-24 h-24 bg-slate-700 rounded-full text-6xl font-bold">-</button>
+                    <span id="currentCount" class="oswald text-9xl font-black min-w-[200px] text-cyan-400">0</span>
+                    <button onclick="changeCount(1)" class="w-24 h-24 bg-slate-700 rounded-full text-6xl font-bold">+</button>
+                </div>
+                <div class="flex flex-col gap-6">
+                    <button onclick="submitScore()" id="btnSubmit" class="bg-yellow-500 text-slate-950 font-black py-8 rounded-[30px] text-4xl shadow-2xl active:scale-95">確認送出</button>
+                    <button onclick="changeStudent()" class="bg-slate-700 text-slate-300 font-bold py-6 rounded-2xl text-2xl hover:bg-slate-600 transition-all active:scale-95">👤 更換學生</button>
+                    <button onclick="toggleView('main')" class="text-slate-400 font-bold text-2xl py-4">返回主頁</button>
+                </div>
+            </div>
+
+            <!-- 隱藏的表單欄位 -->
+            <input type="hidden" id="playerName">
         </div>
     </div>
 
@@ -653,6 +673,93 @@
          */
         const podiumOrder = [10, 8, 6, 4, 2, 1, 3, 5, 7, 9];
         const ADMIN_PASSWORD = "1234"; // ⚠️ 應改為後端驗證
+
+        // ============ 學生資料（硬編碼） ============
+        const STUDENTS = [
+            { className: "一年忠班", seatNumber: 1, name: "謝采銘" },
+            { className: "一年忠班", seatNumber: 2, name: "徐侑樂" },
+            { className: "一年忠班", seatNumber: 3, name: "王晨宇" },
+            { className: "一年忠班", seatNumber: 4, name: "鄭憫程" },
+            { className: "一年忠班", seatNumber: 5, name: "陳暄甯" },
+            { className: "一年忠班", seatNumber: 6, name: "鄭沛馨" },
+            { className: "一年忠班", seatNumber: 7, name: "劉羽晴" },
+            { className: "一年忠班", seatNumber: 8, name: "黃珮蒂" },
+            { className: "一年忠班", seatNumber: 9, name: "劉思妤" },
+            { className: "一年忠班", seatNumber: 10, name: "丁小嵎" },
+            { className: "二年忠班", seatNumber: 1, name: "吳叡均" },
+            { className: "二年忠班", seatNumber: 2, name: "詹康裕" },
+            { className: "二年忠班", seatNumber: 3, name: "王日傑" },
+            { className: "二年忠班", seatNumber: 4, name: "陳佳恩" },
+            { className: "二年忠班", seatNumber: 5, name: "許雨霏" },
+            { className: "二年忠班", seatNumber: 6, name: "林妍妡" },
+            { className: "三年忠班", seatNumber: 1, name: "范育維" },
+            { className: "三年忠班", seatNumber: 2, name: "林昭宇" },
+            { className: "三年忠班", seatNumber: 3, name: "李柏欣" },
+            { className: "三年忠班", seatNumber: 4, name: "江舶綸" },
+            { className: "三年忠班", seatNumber: 5, name: "楊承翰" },
+            { className: "三年忠班", seatNumber: 6, name: "張育峻" },
+            { className: "三年忠班", seatNumber: 7, name: "謝昕澄" },
+            { className: "三年忠班", seatNumber: 8, name: "簡丞恩" },
+            { className: "三年忠班", seatNumber: 9, name: "王 安" },
+            { className: "三年忠班", seatNumber: 10, name: "白訓綱" },
+            { className: "三年忠班", seatNumber: 11, name: "藍禾軒" },
+            { className: "三年忠班", seatNumber: 12, name: "吳若熙" },
+            { className: "三年忠班", seatNumber: 13, name: "陳昀頤" },
+            { className: "四年忠班", seatNumber: 1, name: "楊又霖" },
+            { className: "四年忠班", seatNumber: 2, name: "胡宸豪" },
+            { className: "四年忠班", seatNumber: 3, name: "廖晧丞" },
+            { className: "四年忠班", seatNumber: 4, name: "鄧旻昊" },
+            { className: "四年忠班", seatNumber: 6, name: "蘇峻平" },
+            { className: "四年忠班", seatNumber: 7, name: "徐宇辰" },
+            { className: "四年忠班", seatNumber: 8, name: "陳書亞" },
+            { className: "四年忠班", seatNumber: 9, name: "陳佳寶" },
+            { className: "四年忠班", seatNumber: 10, name: "周旼希" },
+            { className: "四年忠班", seatNumber: 11, name: "施姵岑" },
+            { className: "四年忠班", seatNumber: 12, name: "林羽薰" },
+            { className: "四年忠班", seatNumber: 13, name: "曹智涵" },
+            { className: "四年忠班", seatNumber: 14, name: "洪恩瞳" },
+            { className: "四年忠班", seatNumber: 15, name: "柯若晞" },
+            { className: "四年忠班", seatNumber: 16, name: "沈恩琳" },
+            { className: "四年忠班", seatNumber: 17, name: "何力玄" },
+            { className: "四年忠班", seatNumber: 18, name: "林言芯" },
+            { className: "四年忠班", seatNumber: 19, name: "謝采妍" },
+            { className: "四年忠班", seatNumber: 20, name: "潘韻僑" },
+            { className: "四年忠班", seatNumber: 21, name: "盧亮妘" },
+            { className: "四年忠班", seatNumber: 22, name: "鄭新語" },
+            { className: "五年忠班", seatNumber: 1, name: "簡禾一" },
+            { className: "五年忠班", seatNumber: 2, name: "范博鈞" },
+            { className: "五年忠班", seatNumber: 3, name: "許奕辰" },
+            { className: "五年忠班", seatNumber: 4, name: "陳宥銓" },
+            { className: "五年忠班", seatNumber: 5, name: "陳聖亞" },
+            { className: "五年忠班", seatNumber: 6, name: "鄭孟騫" },
+            { className: "五年忠班", seatNumber: 7, name: "楊承熹" },
+            { className: "五年忠班", seatNumber: 8, name: "陳得樂" },
+            { className: "五年忠班", seatNumber: 9, name: "劉書語" },
+            { className: "五年忠班", seatNumber: 10, name: "簡 允" },
+            { className: "五年忠班", seatNumber: 11, name: "林鼎淵" },
+            { className: "五年忠班", seatNumber: 12, name: "黃家逸" },
+            { className: "五年忠班", seatNumber: 13, name: "謝采書" },
+            { className: "五年忠班", seatNumber: 14, name: "陳佳妮" },
+            { className: "五年忠班", seatNumber: 15, name: "吳若瑭" },
+            { className: "五年忠班", seatNumber: 16, name: "丁相妤" },
+            { className: "五年忠班", seatNumber: 17, name: "林知諭" },
+            { className: "五年忠班", seatNumber: 18, name: "李菀桐" },
+            { className: "五年忠班", seatNumber: 19, name: "呂品蓁" },
+            { className: "五年忠班", seatNumber: 20, name: "謝昀蓁" },
+            { className: "五年忠班", seatNumber: 21, name: "方詩云" },
+            { className: "五年忠班", seatNumber: 22, name: "江柏融" },
+            { className: "六年忠班", seatNumber: 1, name: "鄧裕桐" },
+            { className: "六年忠班", seatNumber: 2, name: "簡丞翰" },
+            { className: "六年忠班", seatNumber: 3, name: "康益誠" },
+            { className: "六年忠班", seatNumber: 4, name: "張育馨" },
+            { className: "六年忠班", seatNumber: 5, name: "方言芯" },
+            { className: "六年忠班", seatNumber: 6, name: "林采君" },
+            { className: "六年忠班", seatNumber: 7, name: "許岑宇" },
+            { className: "六年忠班", seatNumber: 8, name: "林昱辰" },
+            { className: "六年忠班", seatNumber: 9, name: "白芯妃" },
+            { className: "六年忠班", seatNumber: 10, name: "洪冰昕" },
+            { className: "六年忠班", seatNumber: 11, name: "王伊凡" },
+        ];
 
         // ============ 應用狀態 ============
         let scores = [];
@@ -939,12 +1046,109 @@
                 document.getElementById('playerName').value = '';
                 currentInputCount = 0;
                 document.getElementById('currentCount').innerText = '0';
+                // 初始化班級選擇視圖
+                initializeClassSelection();
             } else if (view === 'admin') {
                 document.getElementById('adminModal').classList.remove('hidden');
                 document.getElementById('adminAuth').classList.remove('hidden');
                 document.getElementById('adminPanel').classList.add('hidden');
                 document.getElementById('adminPass').value = '';
             }
+        }
+
+        // ============ 學生選擇卡片系統 ============
+        let selectedClassName = null;
+
+        /**
+         * 初始化班級選擇卡片
+         */
+        function initializeClassSelection() {
+            // 隱藏學生和計數視圖
+            document.getElementById('classSelectionView').classList.remove('hidden');
+            document.getElementById('studentSelectionView').classList.add('hidden');
+            document.getElementById('scoreInputView').classList.add('hidden');
+
+            // 獲取唯一的班級清單
+            const classNames = [...new Set(STUDENTS.map(s => s.className))].sort();
+
+            // 生成班級卡片
+            const container = document.getElementById('classCardsContainer');
+            container.innerHTML = classNames.map(className => `
+                <button onclick="selectClass('${className}')" class="bg-gradient-to-b from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white font-black py-8 rounded-2xl text-xl transition-all active:scale-95 shadow-lg">
+                    ${className}
+                </button>
+            `).join('');
+        }
+
+        /**
+         * 選擇班級，顯示該班學生
+         */
+        function selectClass(className) {
+            selectedClassName = className;
+
+            // 隱藏班級視圖，顯示學生視圖
+            document.getElementById('classSelectionView').classList.add('hidden');
+            document.getElementById('studentSelectionView').classList.remove('hidden');
+
+            // 更新標題
+            document.getElementById('selectedClassLabel').innerText = className;
+
+            // 取得該班學生並生成卡片
+            const classStudents = STUDENTS.filter(s => s.className === className);
+            const container = document.getElementById('studentCardsContainer');
+            container.innerHTML = classStudents.map(student => `
+                <button onclick="selectStudent('${student.name}')" class="bg-gradient-to-b from-yellow-600 to-yellow-700 hover:from-yellow-500 hover:to-yellow-600 text-white font-black py-6 rounded-2xl text-lg transition-all active:scale-95 shadow-lg">
+                    <div class="text-sm opacity-75">座號${student.seatNumber}</div>
+                    <div>${student.name}</div>
+                </button>
+            `).join('');
+        }
+
+        /**
+         * 選擇學生，進入計分視圖
+         */
+        function selectStudent(studentName) {
+            document.getElementById('playerName').value = studentName;
+
+            // 隱藏班級和學生視圖，顯示計數視圖
+            document.getElementById('classSelectionView').classList.add('hidden');
+            document.getElementById('studentSelectionView').classList.add('hidden');
+            document.getElementById('scoreInputView').classList.remove('hidden');
+
+            // 顯示已選擇的學生
+            document.getElementById('selectedStudentDisplay').innerText = `🎣 ${studentName}`;
+
+            // 重置計數
+            currentInputCount = 0;
+            document.getElementById('currentCount').innerText = '0';
+        }
+
+        /**
+         * 返回班級選擇
+         */
+        function backToClassSelection() {
+            document.getElementById('studentSelectionView').classList.add('hidden');
+            document.getElementById('classSelectionView').classList.remove('hidden');
+            selectedClassName = null;
+        }
+
+        /**
+         * 更換學生（返回班級列表）
+         */
+        function changeStudent() {
+            initializeClassSelection();
+        }
+
+        /**
+         * 匿名送出
+         */
+        function selectAnonymous() {
+            document.getElementById('playerName').value = '';
+            document.getElementById('classSelectionView').classList.add('hidden');
+            document.getElementById('scoreInputView').classList.remove('hidden');
+            document.getElementById('selectedStudentDisplay').innerText = '🎣 匿名玩家';
+            currentInputCount = 0;
+            document.getElementById('currentCount').innerText = '0';
         }
 
         /**
