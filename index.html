@@ -1038,6 +1038,9 @@
                         const prevRank = prevRankIdx === -1 ? 999 : prevRankIdx + 1;
 
                         if (newRank > 0) {
+                            // ✅ 找到玩家才清空，避免競態條件（GAS 尚未寫入時不要清空）
+                            lastSubmitted = null;
+
                             const isTop10Entry  = newRank <= 10 && prevRank > 10;
                             const isTop3Entry   = newRank <= 3  && prevRank > 3;
                             const hasRankUp     = prevRank !== 999 && newRank < prevRank;
@@ -1070,11 +1073,10 @@
                                 eventMessage = `🎙️ 主播：${playerName} 剛剛殺進前十！帶著 ${playerCount} 隻魚！`;
                             }
 
-                            // 有事件訊息時立刻插播，不等下一個 5 秒輪詢
+                            // 有事件訊息時立刻插播
                             if (eventMessage) rotateMessage();
                         }
-                        // 觸發後清除 lastSubmitted，避免 5 秒輪詢誤觸發
-                        lastSubmitted = null;
+                        // newRank === 0 代表 GAS 尚未寫入，保留 lastSubmitted 等下一輪輪詢
                     }
 
                     scores = data;
