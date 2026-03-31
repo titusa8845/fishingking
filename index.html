@@ -22,7 +22,7 @@
         }
         .oswald { font-family: 'Oswald', sans-serif; }
         
-        @keyframes fillUp { from { height: 0; opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* --- 領獎台容器 --- */
         .podium-container {
@@ -73,7 +73,8 @@
             height: 0;
             background: linear-gradient(to top, rgba(255,255,255,0.15), currentColor);
             box-shadow: 0 0 25px currentColor;
-            animation: fillUp 2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+            transition: height 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+            animation: fadeIn 0.5s ease forwards;
             position: absolute; bottom: 0;
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
