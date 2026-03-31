@@ -1026,16 +1026,21 @@
                 if (JSON.stringify(data) !== JSON.stringify(scores)) {
                     // 在數據更新前，計算排名變動並決定是否觸發獎牌卡
                     if (lastSubmitted) {
+                        console.log(`🔍 [事件追蹤] lastSubmitted: ${lastSubmitted.name} (${lastSubmitted.count}隻)`);
                         const newRanked = [...data].sort((a, b) => b.count - a.count);
+
+                        // 用名字找（不限 count，因為同名玩家可能有多筆，取最新那筆）
                         const newRankIdx = newRanked.findIndex(p =>
                             p.name === lastSubmitted.name && p.count === lastSubmitted.count
                         );
                         const newRank = newRankIdx + 1;
+                        console.log(`🔍 [事件追蹤] newRankIdx=${newRankIdx}, newRank=${newRank}`);
 
                         const prevRankIdx = previousRanked.findIndex(p =>
-                            p.name === lastSubmitted.name && p.count === lastSubmitted.count
+                            p.name === lastSubmitted.name
                         );
                         const prevRank = prevRankIdx === -1 ? 999 : prevRankIdx + 1;
+                        console.log(`🔍 [事件追蹤] prevRank=${prevRank}`);
 
                         if (newRank > 0) {
                             // ✅ 找到玩家才清空，避免競態條件（GAS 尚未寫入時不要清空）
@@ -1045,6 +1050,7 @@
                             const isTop3Entry   = newRank <= 3  && prevRank > 3;
                             const hasRankUp     = prevRank !== 999 && newRank < prevRank;
                             const isRank1Entry  = newRank === 1  && prevRank !== 1;
+                            console.log(`🔍 [事件追蹤] isTop10=${isTop10Entry} isTop3=${isTop3Entry} rankUp=${hasRankUp} rank1=${isRank1Entry}`);
 
                             if (isTop3Entry || isTop10Entry || hasRankUp || isRank1Entry) {
                                 const playerData = newRanked[newRankIdx];
@@ -1073,8 +1079,11 @@
                                 eventMessage = `🎙️ 主播：${playerName} 剛剛殺進前十！帶著 ${playerCount} 隻魚！`;
                             }
 
+                            console.log(`🎙️ [事件追蹤] eventMessage="${eventMessage}"`);
                             // 有事件訊息時立刻插播
                             if (eventMessage) rotateMessage();
+                        } else {
+                            console.log(`⏳ [事件追蹤] 玩家尚未出現在數據，下輪再試`);
                         }
                         // newRank === 0 代表 GAS 尚未寫入，保留 lastSubmitted 等下一輪輪詢
                     }
