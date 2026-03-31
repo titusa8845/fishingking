@@ -575,12 +575,15 @@
             const container = document.getElementById('podium');
             container.innerHTML = "";
 
-            // 找到最高分，用於計算條形相對高度
-            // 改為掃描整個陣列找最大值（因為現在按時間排序，不是按分數）
-            const max = scores.length > 0 ? Math.max(...scores.map(s => s.count)) : 0;
+            // 1️⃣ 按分數排序找出排名（scores 按時間順序，需要重新排序）
+            const ranked = [...scores].sort((a, b) => b.count - a.count);
 
+            // 2️⃣ 找到最高分，用於計算條形相對高度
+            const max = ranked.length > 0 ? ranked[0].count : 0;
+
+            // 3️⃣ 用 podiumOrder 決定視覺位置（中間最高，左右遞減）
             podiumOrder.forEach(rank => {
-                const data = scores[rank - 1];
+                const data = ranked[rank - 1];
 
                 // 只在有數據時才渲染該排名列
                 if (!data) return;
