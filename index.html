@@ -576,7 +576,8 @@
             container.innerHTML = "";
 
             // 找到最高分，用於計算條形相對高度
-            const max = (scores[0] && scores[0].count > 0) ? scores[0].count : 0;
+            // 改為掃描整個陣列找最大值（因為現在按時間排序，不是按分數）
+            const max = scores.length > 0 ? Math.max(...scores.map(s => s.count)) : 0;
 
             podiumOrder.forEach(rank => {
                 const data = scores[rank - 1];
