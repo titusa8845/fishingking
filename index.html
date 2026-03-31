@@ -489,14 +489,13 @@
             <!-- 學生選擇區域 -->
             <div id="studentSelectionView" class="mb-12 hidden">
                 <button onclick="backToClassSelection()" class="text-cyan-400 font-bold text-lg mb-6 hover:text-cyan-300">← 回上一步</button>
-                <p id="selectedClassLabel" class="text-4xl text-cyan-400 font-black text-center mb-8"></p>
-                <p class="text-xl text-cyan-300 mb-6 font-bold">👤 選擇學生</p>
+                <p id="selectedClassLabel" class="text-4xl text-slate-900 font-black text-center mb-10"></p>
                 <div id="studentCardsContainer" class="flex flex-col gap-3 mb-8 max-h-96 overflow-y-auto"></div>
             </div>
 
             <!-- 已選擇/計數區域 -->
             <div id="scoreInputView" class="hidden">
-                <p id="selectedStudentDisplay" class="text-6xl text-blue-400 font-black mb-8 text-center"></p>
+                <p id="selectedStudentDisplay" class="text-6xl text-slate-900 font-black mb-8 text-center"></p>
                 <div class="flex items-center justify-center gap-12 mb-12">
                     <button onclick="changeCount(-1)" class="w-24 h-24 bg-slate-700 rounded-full text-6xl font-bold">-</button>
                     <span id="currentCount" class="oswald text-9xl font-black min-w-[200px] text-cyan-400">0</span>
@@ -1099,9 +1098,9 @@
             const classStudents = STUDENTS.filter(s => s.className === className);
             const container = document.getElementById('studentCardsContainer');
             container.innerHTML = classStudents.map(student => `
-                <button onclick="selectStudent('${student.name}')" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-black py-5 px-6 rounded-2xl text-xl transition-all active:scale-95 shadow-lg text-left flex items-center gap-4">
-                    <span class="text-cyan-300 text-2xl font-bold">${String(student.seatNumber).padStart(2, '0')}</span>
-                    <span>${student.name}</span>
+                <button onclick="selectStudent('${student.name}')" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-900 font-black py-5 px-6 rounded-2xl text-xl transition-all active:scale-95 shadow-md text-left flex items-center gap-6">
+                    <span class="text-cyan-500 text-2xl font-bold">${String(student.seatNumber).padStart(2, '0')}</span>
+                    <span class="text-slate-900">${student.name}</span>
                 </button>
             `).join('');
         }
