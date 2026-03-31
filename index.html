@@ -361,7 +361,7 @@
 
         <section class="bg-slate-950/40 border border-white/10 rounded-[40px] p-8 md:p-10 backdrop-blur-xl mb-20 shadow-2xl">
             <h3 class="text-2xl font-black mb-8 flex items-center gap-4">
-                <span class="w-2 h-8 bg-cyan-400 rounded-full animate-pulse"></span> 挑戰者實況 (11+)
+                <span class="w-2 h-8 bg-cyan-400 rounded-full animate-pulse"></span> 挑戰者實況
             </h3>
             <ul id="leaderboardList" class="grid grid-cols-1 md:grid-cols-3 gap-6"></ul>
         </section>
@@ -573,33 +573,32 @@
         }
 
         /**
-         * 渲染排行榜列表（11+ 名）
+         * 渲染挑戰者實況日誌
          *
-         * 顯示前 10 名外的挑戰者
+         * 顯示所有提交記錄，最新的在最上面
          */
         function renderList() {
             const listEl = document.getElementById('leaderboardList');
             listEl.innerHTML = "";
-            const others = scores.slice(10);
 
-            if (others.length === 0) {
+            // 反轉 scores，讓最新的在上面
+            const allScores = [...scores].reverse();
+
+            if (allScores.length === 0) {
                 listEl.innerHTML = `<li class="col-span-full py-16 text-center text-slate-500 italic text-2xl font-bold">海洋正在等待新的挑戰者...</li>`;
                 return;
             }
 
-            others.forEach((p, idx) => {
+            allScores.forEach((p) => {
                 const li = document.createElement('li');
                 // 識別新項目（最近提交的玩家）
                 const isNew = lastSubmitted &&
                               p.name === lastSubmitted.name &&
                               p.count === lastSubmitted.count;
-                li.className = `flex items-center justify-between bg-white/5 p-8 rounded-[30px] border border-white/5 hover:bg-white/10 transition-all${isNew ? ' item-new-entry' : ''}`;
+                li.className = `flex items-center justify-between bg-white/5 p-8 rounded-[30px] hover:bg-white/10 transition-all${isNew ? ' item-new-entry' : ''}`;
                 li.innerHTML = `
-                    <div class="flex items-center gap-6">
-                        <span class="oswald text-slate-500 text-3xl font-bold">#${idx + 11}</span>
-                        <div class="font-black text-2xl text-white">${escapeHtml(p.name)}</div>
-                    </div>
-                    <div class="oswald text-4xl font-black text-slate-300">${p.count}</div>
+                    <div class="font-black text-2xl text-white">${escapeHtml(p.name)}</div>
+                    <div class="oswald text-4xl font-black text-cyan-400">🎣 ${p.count}</div>
                 `;
                 listEl.appendChild(li);
             });
