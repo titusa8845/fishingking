@@ -1198,10 +1198,6 @@
                 listEl.appendChild(li);
             });
 
-            // 動畫播完後清除 lastSubmitted 標記
-            if (lastSubmitted) {
-                setTimeout(() => { lastSubmitted = null; }, 600);
-            }
         }
 
         // ============ UI 工具函式 ============
@@ -1579,10 +1575,13 @@
             document.getElementById('b-title').innerText = title;
             document.getElementById('b-heckle').innerText = heckle;
 
-            // 顯示廣播 6 秒後自動重載
+            // 顯示廣播 4 秒後自動關閉（不重載，讓老師繼續幫下一個人報分）
             overlay.classList.remove('hidden');
             overlay.classList.add('flex');
-            setTimeout(() => { location.reload(); }, 6000);
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
+            }, 4000);
         }
 
         /**
