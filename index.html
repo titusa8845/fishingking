@@ -1079,6 +1079,17 @@
                             else if (isTop10Entry) {
                                 eventMessage = `🎙️ 主播：${playerName} 剛剛殺進前十！帶著 ${playerCount} 隻魚！`;
                             }
+                            // 優先順序 5：保底——任何提交都廣播（已在排名中的玩家更新分數）
+                            else {
+                                const title = calculateTitle(playerCount);
+                                if (newRank === 1) {
+                                    eventMessage = `👑 ${playerName} 繼續稱霸第一！${playerCount} 隻！${title}！`;
+                                } else if (newRank <= 3) {
+                                    eventMessage = `🎙️ 主播：${playerName} 前三在握！目前 ${playerCount} 隻！`;
+                                } else {
+                                    eventMessage = `🎣 ${playerName} 回報了 ${playerCount} 隻！目前第 ${newRank} 名！`;
+                                }
+                            }
 
                             console.log(`🎙️ [事件追蹤] eventMessage="${eventMessage}"`);
                             // 有事件訊息時立刻插播
