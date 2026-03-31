@@ -105,12 +105,13 @@ function setupSheet() {
 
 /**
  * 根據數量計算榮譽稱號 (連動系統)
+ * 激進分級（基於實測最高 ~20 隻）
  */
 function calculateTitle(count) {
-  if (count >= 100) return "👾 水缸終結者";
-  if (count >= 51)  return "👑 義方金魚王";
-  if (count >= 31)  return "🏅 夜市常客";
-  if (count >= 11)  return "🎣 垂釣學徒";
+  if (count >= 18) return "👾 水缸終結者";
+  if (count >= 13) return "👑 義方金魚王";
+  if (count >= 8)  return "🏅 夜市常客";
+  if (count >= 4)  return "🎣 垂釣學徒";
   return "🌊 觀浪者";
 }
 
