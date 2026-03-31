@@ -1432,20 +1432,25 @@
                 // 記錄提交的玩家資料，供動態事件廣播與動畫使用（任何分數都設）
                 lastSubmitted = { name, count: currentInputCount };
 
+                // 等 GAS 寫入後立即拉取新數據（觸發動態事件廣播）
+                setTimeout(fetchScores, 500);
+
                 // 高分才觸發全螢幕廣播 overlay（threshold: 18 隻，對應水缸終結者）
                 if (currentInputCount >= 18) {
                     triggerBroadcast(name, currentInputCount);
+                    // overlay 期間不跳回班級選擇，讓老師看完再繼續
+                    // overlay 4 秒後自動關閉（triggerBroadcast 內處理），關閉後才重回選班
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.innerText = "確認送出";
+                        initializeClassSelection();
+                    }, 4200); // 比 overlay 關閉多 200ms
                 } else {
                     showToast('回報成功！🎣', 'success');
+                    btn.disabled = false;
+                    btn.innerText = "確認送出";
+                    initializeClassSelection();
                 }
-
-                // 恢復按鈕狀態，重回班級選擇
-                btn.disabled = false;
-                btn.innerText = "確認送出";
-                initializeClassSelection();
-
-                // 等 GAS 寫入後立即拉取新數據（觸發動態事件廣播）
-                setTimeout(fetchScores, 500);
             } catch (err) {
                 console.error("提交失敗:", err);
                 showToast('提交失敗，請檢查網路', 'error');
