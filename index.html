@@ -1209,7 +1209,7 @@
                     : '';
                 // 時間戳記標籤（轉為本地時間 HH:MM）
                 const timeStr = p.timestamp
-                    ? new Date(p.timestamp).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false })
+                    ? new Date(p.timestamp).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
                     : '';
                 const timeTag = timeStr
                     ? `<span style="font-size:1.4rem;font-weight:600;color:#94a3b8;background:rgba(148,163,184,0.1);border:1px solid rgba(148,163,184,0.3);padding:3px 12px;border-radius:16px;margin-left:12px;white-space:nowrap;">${timeStr}</span>`
