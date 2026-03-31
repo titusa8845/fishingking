@@ -339,6 +339,30 @@
         .medal-card-enter { animation: medalPop 0.4s ease-out forwards; }
         .medal-card-exit  { animation: medalFade 0.5s ease-in forwards; }
 
+        /* 廣播跑馬燈 */
+        @keyframes marquee {
+            0%   { transform: translateX(100%); opacity: 0; }
+            5%   { opacity: 1; }
+            95%  { opacity: 1; }
+            100% { transform: translateX(-100%); opacity: 0; }
+        }
+        .broadcast-marquee {
+            background: linear-gradient(90deg, rgba(6, 182, 212, 0.1) 0%, rgba(6, 182, 212, 0.3) 50%, rgba(6, 182, 212, 0.1) 100%);
+            border-top: 2px solid rgba(6, 182, 212, 0.5);
+            border-bottom: 2px solid rgba(6, 182, 212, 0.5);
+            padding: 12px 0;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+        .broadcast-text {
+            display: inline-block;
+            white-space: nowrap;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #06b6d4;
+            animation: marquee 8s linear infinite;
+        }
+
         /* 新項目進入動畫 + 青色光暈 */
         @keyframes slideInDownWithGlow {
             0% {
@@ -405,6 +429,11 @@
         </header>
 
         <section id="podium" class="podium-container"></section>
+
+        <!-- 廣播跑馬燈 -->
+        <div class="broadcast-marquee">
+            <span id="broadcastText" class="broadcast-text">🎙️ 主播：各位！現在戰況非常激烈！</span>
+        </div>
 
         <section class="bg-slate-950/40 border border-white/10 rounded-[40px] p-8 md:p-10 backdrop-blur-xl mb-20 shadow-2xl">
             <h3 class="text-2xl font-black mb-8 flex items-center gap-4">
@@ -530,6 +559,25 @@
             if (rank === 3) return '🥉';  // 銅牌
             return '';
         };
+
+        /**
+         * 廣播訊息池
+         */
+        const broadcastMessages = [
+            '🎙️ 主播：各位！現在戰況非常激烈！',
+            '🎙️ 主播：有人要逆轉勝嗎？',
+            '👨‍🍳 攤販：你阿嬤都比你厲害，連鮮蝦都捲起來了！',
+            '👨‍🍳 攤販：欸不是，這什麼速度啦，蝦子都跑掉了啦！',
+            '👨‍🍳 攤販：連我家的貓都捉得比你多啦！',
+            '👥 觀眾：哇！又有人上榜了！',
+            '👥 觀眾：喔喔喔～～',
+            '🎙️ 主播：現在誰是金魚王？拭目以待！',
+            '👨‍🍳 攤販：欸你看，這隻連自己都不知道怎麼活的！',
+            '👥 觀眾：哈哈哈哈～～',
+            '🎙️ 主播：水準越來越高啦！',
+            '👨‍🍳 攤販：我的天哪，你這手速根本天才啦！',
+        ];
+        let currentMessageIndex = 0;
 
         /**
          * 領獎台排序邏輯
@@ -1066,6 +1114,20 @@
         }
 
         // ============ 初始化 & 定期更新 ============
+
+        /**
+         * 廣播訊息輪換
+         */
+        function rotateMessage() {
+            const broadcastText = document.getElementById('broadcastText');
+            broadcastText.innerText = broadcastMessages[currentMessageIndex];
+            currentMessageIndex = (currentMessageIndex + 1) % broadcastMessages.length;
+        }
+
+        // 初始化廣播訊息
+        rotateMessage();
+        // 每 9 秒換一句（跑馬燈動畫 8 秒 + 1 秒間隔）
+        setInterval(rotateMessage, 9000);
 
         // 載入初始數據
         fetchScores();
