@@ -41,11 +41,10 @@ function doGet(e) {
   });
 
   // 排序邏輯：
-  // 1. 數量降序 (由大到小)
-  // 2. 時間升序 (先達標者在前)
+  // 按時間降序排列（最新提交的在前）
+  // 不按分數排序，保留純粹的時間順序
   players.sort(function(a, b) {
-    if (b.count !== a.count) return b.count - a.count;
-    return new Date(a.timestamp) - new Date(b.timestamp);
+    return new Date(b.timestamp) - new Date(a.timestamp);
   });
 
   // 回傳結果

@@ -596,8 +596,8 @@
             const listEl = document.getElementById('leaderboardList');
             listEl.innerHTML = "";
 
-            // 反轉 scores，讓最新的在上面
-            const allScores = [...scores].reverse();
+            // GAS 已按時間排序（最新在前），直接使用
+            const allScores = scores;
 
             if (allScores.length === 0) {
                 listEl.innerHTML = `<li class="col-span-full py-16 text-center text-slate-500 italic text-2xl font-bold">海洋正在等待新的挑戰者...</li>`;
