@@ -264,6 +264,38 @@
 
         .pb-32 { padding-bottom: 8rem; }
 
+        /* === 班級卡牌樣式 === */
+        .class-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .class-btn {
+            padding: 18px 24px;
+            font-size: 18px;
+            font-weight: 700;
+            border: 3px solid #e5e7eb;
+            border-radius: 16px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            color: #374151;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .class-btn:hover {
+            border-color: #2563eb;
+            background: #dbeafe;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.2);
+        }
+
+        .class-btn:active {
+            transform: translateY(0);
+        }
+
         /* Toast 通知 */
         .toast {
             position: fixed;
@@ -1072,10 +1104,11 @@
             // 獲取唯一的班級清單
             const classNames = [...new Set(STUDENTS.map(s => s.className))].sort();
 
-            // 生成班級卡片
+            // 生成班級卡片（整列）
             const container = document.getElementById('classCardsContainer');
+            container.className = 'class-grid';
             container.innerHTML = classNames.map(className => `
-                <button onclick="selectClass('${className}')" class="bg-gradient-to-b from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white font-black py-8 rounded-2xl text-xl transition-all active:scale-95 shadow-lg">
+                <button onclick="selectClass('${className}')" class="class-btn">
                     ${className}
                 </button>
             `).join('');
