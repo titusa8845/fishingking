@@ -1413,23 +1413,23 @@
 
                 const responseText = await res.text();
 
-                // 檢查是否為新紀錄
-                if (currentInputCount >= 50 || (scores[0] && currentInputCount > scores[0].count)) {
+                // 記錄提交的玩家資料，供動態事件廣播與動畫使用（任何分數都設）
+                lastSubmitted = { name, count: currentInputCount };
+
+                // 高分才觸發全螢幕廣播 overlay（threshold: 18 隻，對應水缸終結者）
+                if (currentInputCount >= 18) {
                     triggerBroadcast(name, currentInputCount);
                 } else {
                     showToast('回報成功！🎣', 'success');
-                    // 記錄提交的玩家資料，用於動畫識別
-                    lastSubmitted = { name, count: currentInputCount };
-                    // 恢復按鈕狀態
-                    btn.disabled = false;
-                    btn.innerText = "確認送出";
-
-                    // 送出成功後重回班級選擇，方便繼續為下一個學生回報
-                    initializeClassSelection();
-
-                    // 等 GAS 寫入後立即拉取新數據
-                    setTimeout(fetchScores, 500);
                 }
+
+                // 恢復按鈕狀態，重回班級選擇
+                btn.disabled = false;
+                btn.innerText = "確認送出";
+                initializeClassSelection();
+
+                // 等 GAS 寫入後立即拉取新數據（觸發動態事件廣播）
+                setTimeout(fetchScores, 500);
             } catch (err) {
                 console.error("提交失敗:", err);
                 showToast('提交失敗，請檢查網路', 'error');
