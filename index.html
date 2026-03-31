@@ -1207,11 +1207,19 @@
                 const classTag = student
                     ? `<span style="font-size:2.25rem;font-weight:700;color:#67e8f9;background:rgba(6,182,212,0.15);border:2px solid rgba(6,182,212,0.4);padding:4px 16px;border-radius:20px;margin-left:20px;white-space:nowrap;">${escapeHtml(student.className)}</span>`
                     : '';
+                // 時間戳記標籤（轉為本地時間 HH:MM）
+                const timeStr = p.timestamp
+                    ? new Date(p.timestamp).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false })
+                    : '';
+                const timeTag = timeStr
+                    ? `<span style="font-size:1.4rem;font-weight:600;color:#94a3b8;background:rgba(148,163,184,0.1);border:1px solid rgba(148,163,184,0.3);padding:3px 12px;border-radius:16px;margin-left:12px;white-space:nowrap;">${timeStr}</span>`
+                    : '';
                 li.className = `flex items-center justify-between bg-white/5 px-8 py-3 rounded-[20px] hover:bg-white/10 transition-all${isNew ? ' item-new-entry' : ''}`;
                 li.innerHTML = `
                     <div class="flex items-center">
                         <span class="font-black text-7xl text-white">${escapeHtml(p.name)}</span>
                         ${classTag}
+                        ${timeTag}
                     </div>
                     <div class="oswald text-8xl font-black text-cyan-400">🎣 ${p.count}</div>
                 `;
