@@ -655,6 +655,10 @@
          * @returns {string} 轉義後的文本
          */
         function escapeHtml(text) {
+            // 防護：確保輸入是字符串
+            if (text === null || text === undefined) return '';
+            if (typeof text !== 'string') text = String(text);
+
             const map = {
                 '&': '&amp;',
                 '<': '&lt;',
