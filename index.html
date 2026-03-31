@@ -491,6 +491,16 @@
         };
 
         /**
+         * 根據排名返回獎牌 EMOJI
+         */
+        const getEmoji = (rank) => {
+            if (rank === 1) return '👑';  // 皇冠
+            if (rank === 2) return '🥈';  // 銀牌
+            if (rank === 3) return '🥉';  // 銅牌
+            return '';
+        };
+
+        /**
          * 領獎台排序邏輯
          * 實現 1, 2, 3 名在中間，周圍對稱遞減的視覺效果
          * 左: 10, 8, 6, 4, 2 | 中: 1 | 右: 3, 5, 7, 9
@@ -623,7 +633,7 @@
                     <div class="bar-wrapper">
                         <div id="bar-${rank}" class="bar-fill neon-${rank}" style="height: 0%"></div>
                     </div>
-                    <span class="rank-label ${getRankSize(rank)} neon-${rank}">${rank}</span>
+                    <span class="rank-label ${getRankSize(rank)} neon-${rank}">${getEmoji(rank)} ${rank}</span>
                 `;
                 container.appendChild(column);
 
