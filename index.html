@@ -1101,9 +1101,10 @@
                             console.log(`🎙️ [事件追蹤] eventMessage="${eventMessage}"`);
                             // 有事件訊息時：跑馬燈 + 醒目插播橫幅（頂端滑入）
                             if (eventMessage) {
+                                const bannerMsg = eventMessage; // 先存，rotateMessage 內會清掉 eventMessage
                                 rotateMessage();
                                 scheduleBroadcast();
-                                triggerEventBanner(eventMessage);
+                                triggerEventBanner(bannerMsg);
                             }
                         } else {
                             console.log(`⏳ [事件追蹤] 玩家尚未出現在數據，下輪再試`);
