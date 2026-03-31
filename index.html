@@ -624,8 +624,9 @@
 
         // 階段 3：動態事件（優先廣播，由排名變動觸發）
         let eventMessage = null;
-        let welcomeIndex = 0;
-        let battleIndex = 0;
+        // 初始化時使用隨機起始索引
+        let welcomeIndex = Math.floor(Math.random() * 12); // MSG_WELCOME 有 12 條訊息
+        let battleIndex = Math.floor(Math.random() * 13);  // MSG_BATTLE 有 13 條訊息
 
         function getNextMessage() {
             // 1️⃣ 動態事件優先
