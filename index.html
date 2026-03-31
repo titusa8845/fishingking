@@ -409,6 +409,23 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
+        /* 前三名閃爍動畫 */
+        @keyframes glowGold {
+            0%, 100% { text-shadow: 0 0 8px rgba(251,191,36,0.4), 0 0 16px rgba(251,191,36,0.2); filter: brightness(1); }
+            50%       { text-shadow: 0 0 20px rgba(251,191,36,1), 0 0 40px rgba(251,191,36,0.7), 0 0 60px rgba(251,191,36,0.4); filter: brightness(1.4); }
+        }
+        @keyframes glowSilver {
+            0%, 100% { text-shadow: 0 0 8px rgba(148,163,184,0.4); filter: brightness(1); }
+            50%       { text-shadow: 0 0 20px rgba(148,163,184,1), 0 0 40px rgba(148,163,184,0.6); filter: brightness(1.3); }
+        }
+        @keyframes glowBronze {
+            0%, 100% { text-shadow: 0 0 8px rgba(180,83,9,0.4); filter: brightness(1); }
+            50%       { text-shadow: 0 0 20px rgba(180,83,9,1), 0 0 40px rgba(217,119,6,0.6); filter: brightness(1.3); }
+        }
+        .glow-rank-1 { animation: glowGold   1.8s ease-in-out infinite; }
+        .glow-rank-2 { animation: glowSilver 2.2s ease-in-out infinite; }
+        .glow-rank-3 { animation: glowBronze 2.0s ease-in-out infinite; }
+
         /* 固定名次標籤 */
         .rank-label {
             font-family: 'Oswald', sans-serif;
@@ -1077,15 +1094,16 @@
                 // 計算填充高度百分比
                 const fillHeight = (max === 0 || data.count === 0) ? 0 : (data.count / max) * 100;
 
+                const glowClass = rank <= 3 ? `glow-rank-${rank}` : '';
                 column.innerHTML = `
                     <div class="text-center mb-3 w-full">
-                        <span class="block ${getNameSize(rank)} font-bold text-slate-300 px-1 whitespace-normal break-words">${escapeHtml(data.name)}</span>
+                        <span class="block ${getNameSize(rank)} font-bold text-slate-300 px-1 whitespace-normal break-words ${glowClass}">${escapeHtml(data.name)}</span>
                         <span class="oswald ${getScoreSize(rank)} font-bold neon-${rank}">${data.count}</span>
                     </div>
                     <div class="bar-wrapper">
                         <div id="bar-${rank}" class="bar-fill neon-${rank}" style="height: 0%"></div>
                     </div>
-                    <span class="rank-label ${getRankSize(rank)} neon-${rank}">${getEmoji(rank)} ${rank}</span>
+                    <span class="rank-label ${getRankSize(rank)} neon-${rank} ${glowClass}">${getEmoji(rank)} ${rank}</span>
                 `;
                 container.appendChild(column);
 
