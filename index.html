@@ -296,6 +296,48 @@
             transform: translateY(0);
         }
 
+        /* === 學生卡牌樣式 === */
+        .student-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .student-btn {
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: 700;
+            border: 3px solid #e5e7eb;
+            border-radius: 16px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            color: #374151;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .student-btn:hover {
+            border-color: #2563eb;
+            background: #dbeafe;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.2);
+        }
+
+        .student-btn:active {
+            transform: translateY(0);
+        }
+
+        .student-btn .seat {
+            color: #0284c7;
+            font-size: 18px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
         /* Toast 通知 */
         .toast {
             position: fixed;
@@ -1127,13 +1169,14 @@
             // 更新標題
             document.getElementById('selectedClassLabel').innerText = className;
 
-            // 取得該班學生並生成卡片（整列）
+            // 取得該班學生並生成卡片（整列卡牌）
             const classStudents = STUDENTS.filter(s => s.className === className);
             const container = document.getElementById('studentCardsContainer');
+            container.className = 'student-grid';
             container.innerHTML = classStudents.map(student => `
-                <button onclick="selectStudent('${student.name}')" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-900 font-black py-5 px-6 rounded-2xl text-xl transition-all active:scale-95 shadow-md text-left flex items-center gap-6">
-                    <span class="text-cyan-500 text-2xl font-bold">${String(student.seatNumber).padStart(2, '0')}</span>
-                    <span class="text-slate-900">${student.name}</span>
+                <button onclick="selectStudent('${student.name}')" class="student-btn">
+                    <span class="seat">${String(student.seatNumber).padStart(2, '0')}</span>
+                    <span>${student.name}</span>
                 </button>
             `).join('');
         }
