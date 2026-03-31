@@ -781,9 +781,17 @@
             '👨‍🍳 老闆：各位來試試！今天的魚特別好捉喔～',
             '👨‍🍳 老闆：欸，你們來啊，我的金魚在等你們！',
             '👨‍🍳 老闆：準備好被我虐殺嗎？不是啦，是虐殺我的金魚！',
-            '👨‍🍳 老闆：來來來，今天特別優惠，滿 50 隻送一個人生夢想！',
+            '👨‍🍳 老闆：來來來，今天特別優惠，滿 18 隻封神，你行嗎？',
             '👨‍🍳 老闆：我跟你講，上次有人捉 18 隻，我現在還在數金魚...',
             '👨‍🍳 老闆：別看我的水缸，待會就要被你們搞亂了！',
+            '🎙️ 主播：規則很簡單，撈越多越威，就這樣！',
+            '👩‍🏫 姿樺老師：大家加油！老師在看著你們喔！',
+            '🎙️ 主播：傳說中的義方金魚王，今天會誕生嗎？',
+            '👨‍🍳 老闆：我的魚很小隻，但你的夢想要很大隻！',
+            '👩‍🏫 姿樺老師：今天的冠軍，會是誰呢？讓我們拭目以待！',
+            '🎙️ 主播：現場氣氛超熱烈，選手們蓄勢待發！',
+            '👨‍🍳 老闆：我準備好被你們打敗了，你們準備好了嗎？',
+            '🎙️ 主播：撈魚不只是技術，更是一種人生態度！',
         ];
 
         // 階段 2：激烈戰況（人數 >= 10）
@@ -801,13 +809,26 @@
             '👥 觀眾：喔喔喔～～',
             '👥 觀眾：哈哈哈哈～～',
             '👥 觀眾：加油啊！你可以的啦！',
+            '🎙️ 主播：排行榜上的名字，分分鐘都在變！',
+            '👨‍🍳 攤販：我今晚要收攤了啦！你們給我捉快點！',
+            '👥 觀眾：這個人不得了啊！手速超快！',
+            '🎙️ 主播：差距越來越小！這場比賽真是不到最後不知道！',
+            '👨‍🍳 攤販：老闆說他準備要把攤位頂讓給你了...',
+            '👥 觀眾：哇哦～這個組合出乎我意料！',
+            '🎙️ 主播：金魚王的寶座，今晚只屬於一個人！',
+            '👨‍🍳 攤販：你這個速度，我水缸的金魚快要絕種了啦！',
+            '👥 觀眾：衝啊衝啊！差一名而已！',
+            '🎙️ 主播：現在是最後衝刺階段，誰能笑到最後？',
+            '👨‍🍳 攤販：我進貨的速度跟不上你撈的速度啦！',
+            '👥 觀眾：他在發抖嗎？還是我在發抖？',
+            '🎙️ 主播：義方夜市最強撈魚手，就在今晚誕生！',
         ];
 
         // 階段 3：動態事件（優先廣播，由排名變動觸發）
         let eventMessage = null;
         // 初始化時使用隨機起始索引
-        let welcomeIndex = Math.floor(Math.random() * 12); // MSG_WELCOME 有 12 條訊息
-        let battleIndex = Math.floor(Math.random() * 13);  // MSG_BATTLE 有 13 條訊息
+        let welcomeIndex = Math.floor(Math.random() * MSG_WELCOME.length);
+        let battleIndex = Math.floor(Math.random() * MSG_BATTLE.length);
 
         function getNextMessage() {
             // 1️⃣ 動態事件優先
@@ -834,6 +855,14 @@
          */
         const podiumOrder = [10, 8, 6, 4, 2, 1, 3, 5, 7, 9];
         const ADMIN_PASSWORD = "1234"; // ⚠️ 應改為後端驗證
+
+        function calculateTitle(count) {
+            if (count >= 18) return "👾 水缸終結者";
+            if (count >= 13) return "👑 義方金魚王";
+            if (count >= 8)  return "🏅 夜市常客";
+            if (count >= 4)  return "🎣 垂釣學徒";
+            return "🌊 觀浪者";
+        }
 
         // ============ 學生資料（硬編碼） ============
         const STUDENTS = [
@@ -1033,6 +1062,9 @@
                             else if (isTop10Entry) {
                                 eventMessage = `🎙️ 主播：${playerName} 剛剛殺進前十！帶著 ${playerCount} 隻魚！`;
                             }
+
+                            // 有事件訊息時立刻插播，不等下一個 5 秒輪詢
+                            if (eventMessage) rotateMessage();
                         }
                         // 觸發後清除 lastSubmitted，避免 5 秒輪詢誤觸發
                         lastSubmitted = null;
@@ -1140,8 +1172,8 @@
                               p.count === lastSubmitted.count;
                 li.className = `flex items-center justify-between bg-white/5 p-8 rounded-[30px] hover:bg-white/10 transition-all${isNew ? ' item-new-entry' : ''}`;
                 li.innerHTML = `
-                    <div class="font-black text-2xl text-white">${escapeHtml(p.name)}</div>
-                    <div class="oswald text-4xl font-black text-cyan-400">🎣 ${p.count}</div>
+                    <div class="font-black text-4xl text-white">${escapeHtml(p.name)}</div>
+                    <div class="oswald text-5xl font-black text-cyan-400">🎣 ${p.count}</div>
                 `;
                 listEl.appendChild(li);
             });
@@ -1429,7 +1461,7 @@
 
             document.getElementById('mc-name').innerText = escapeHtml(name);
             document.getElementById('mc-count').innerText = count;
-            document.getElementById('mc-title').innerText = title || '🌊 觀浪者';
+            document.getElementById('mc-title').innerText = calculateTitle(count);
             document.getElementById('mc-rank-badge').innerText = rankMsg;
 
             const card = document.getElementById('medalCard');
@@ -1510,16 +1542,18 @@
             document.getElementById('b-name').innerText = escapeHtml(name);
             document.getElementById('b-count').innerText = count;
 
-            // 根據成績分級設定頭銜
-            let title = "🌊 觀浪者";
+            // 根據成績分級設定頭銜（與 GAS 後端同步）
+            const title = calculateTitle(count);
             let heckle = "只是來借廁所的吧？";
 
-            if (count >= 100) {
-                title = "👾 水缸終結者";
+            if (count >= 18) {
                 heckle = "警報！水箱已爆裂，老闆準備轉行！";
-            } else if (count >= 51) {
-                title = "👑 義方金魚王";
+            } else if (count >= 13) {
                 heckle = "新王登基！全場尖叫聲！";
+            } else if (count >= 8) {
+                heckle = "這位常客，你的魚網是不是開外掛啊！";
+            } else if (count >= 4) {
+                heckle = "入門了！繼續衝啊！";
             }
 
             document.getElementById('b-title').innerText = title;
