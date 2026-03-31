@@ -418,6 +418,7 @@
             </div>
             <div class="flex flex-col gap-6">
                 <button onclick="submitScore()" id="btnSubmit" class="bg-yellow-500 text-slate-950 font-black py-8 rounded-[30px] text-4xl shadow-2xl active:scale-95">確認送出</button>
+                <button onclick="clearInput()" class="bg-slate-700 text-slate-300 font-bold py-6 rounded-2xl text-2xl hover:bg-slate-600 transition-all active:scale-95">🗑️ 清空輸入</button>
                 <button onclick="toggleView('main')" class="text-slate-400 font-bold text-2xl py-4">返回主頁</button>
             </div>
         </div>
@@ -810,9 +811,12 @@
                     // 恢復按鈕狀態
                     btn.disabled = false;
                     btn.innerText = "確認送出";
-                    // 重置計數器和顯示
+
+                    // 清空輸入欄（保持彈窗開啟，方便繼續輸入）
+                    document.getElementById('playerName').value = '';
                     currentInputCount = 0;
                     document.getElementById('currentCount').innerText = "0";
+
                     // 等 GAS 寫入後立即拉取新數據
                     setTimeout(fetchScores, 500);
                 }
@@ -822,6 +826,15 @@
                 btn.disabled = false;
                 btn.innerText = "確認送出";
             }
+        }
+
+        /**
+         * 清空輸入欄
+         */
+        function clearInput() {
+            document.getElementById('playerName').value = '';
+            currentInputCount = 0;
+            document.getElementById('currentCount').innerText = "0";
         }
 
         /**
