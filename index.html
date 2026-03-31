@@ -327,6 +327,15 @@
         .parallax > use:nth-child(3) { animation-delay: -4s; animation-duration: 13s; }
         .parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 20s; }
         @keyframes move-forever { 0% { transform: translate3d(-90px,0,0); } 100% { transform: translate3d(85px,0,0); } }
+
+        /* 新項目進入動畫 */
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .item-new-entry {
+            animation: slideInDown 0.5s ease-out;
+        }
     </style>
 </head>
 <body>
@@ -440,6 +449,7 @@
         let scores = [];
         let currentInputCount = 0;
         let isLoadingScores = false;
+        let lastSubmitted = null; // 記錄最近提交的玩家 { name, count }，用於動畫識別
 
         /**
          * 驗證 Google Apps Script 響應格式
@@ -575,7 +585,11 @@
 
             others.forEach((p, idx) => {
                 const li = document.createElement('li');
-                li.className = "flex items-center justify-between bg-white/5 p-8 rounded-[30px] border border-white/5 hover:bg-white/10 transition-all";
+                // 識別新項目（最近提交的玩家）
+                const isNew = lastSubmitted &&
+                              p.name === lastSubmitted.name &&
+                              p.count === lastSubmitted.count;
+                li.className = `flex items-center justify-between bg-white/5 p-8 rounded-[30px] border border-white/5 hover:bg-white/10 transition-all${isNew ? ' item-new-entry' : ''}`;
                 li.innerHTML = `
                     <div class="flex items-center gap-6">
                         <span class="oswald text-slate-500 text-3xl font-bold">#${idx + 11}</span>
@@ -585,6 +599,11 @@
                 `;
                 listEl.appendChild(li);
             });
+
+            // 動畫播完後清除 lastSubmitted 標記
+            if (lastSubmitted) {
+                setTimeout(() => { lastSubmitted = null; }, 600);
+            }
         }
 
         // ============ UI 工具函式 ============
@@ -716,9 +735,17 @@
                 if (currentInputCount >= 50 || (scores[0] && currentInputCount > scores[0].count)) {
                     triggerBroadcast(name, currentInputCount);
                 } else {
-                    showToast('回報成功！', 'success');
-                    // 1 秒後重載
-                    setTimeout(() => location.reload(), 1000);
+                    showToast('回報成功！🎣', 'success');
+                    // 記錄提交的玩家資料，用於動畫識別
+                    lastSubmitted = { name, count: currentInputCount };
+                    // 恢復按鈕狀態
+                    btn.disabled = false;
+                    btn.innerText = "確認送出";
+                    // 重置計數器和顯示
+                    currentInputCount = 0;
+                    document.getElementById('currentCount').innerText = "0";
+                    // 等 GAS 寫入後立即拉取新數據
+                    setTimeout(fetchScores, 500);
                 }
             } catch (err) {
                 console.error("提交失敗:", err);
