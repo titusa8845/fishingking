@@ -595,14 +595,14 @@
                 const fillHeight = (max === 0 || data.count === 0) ? 0 : (data.count / max) * 100;
 
                 column.innerHTML = `
-                    <div class="text-center mb-3 w-full ${rank === 1 ? 'podium-rank-1-text' : ''}">
-                        <span class="block ${rank === 1 ? 'text-2xl' : 'text-[12px]'} font-bold text-slate-300 truncate px-1">${escapeHtml(data.name)}</span>
-                        <span class="oswald ${rank === 1 ? 'text-6xl' : 'text-2xl'} font-bold neon-${rank}">${data.count}</span>
+                    <div class="text-center mb-3 w-full">
+                        <span class="block text-lg font-bold text-slate-300 truncate px-1">${escapeHtml(data.name)}</span>
+                        <span class="oswald text-4xl font-bold neon-${rank}">${data.count}</span>
                     </div>
                     <div class="bar-wrapper">
                         <div id="bar-${rank}" class="bar-fill neon-${rank}" style="height: 0%"></div>
                     </div>
-                    <span class="rank-label ${rank === 1 ? 'text-5xl' : ''} neon-${rank}">${rank}</span>
+                    <span class="rank-label text-3xl neon-${rank}">${rank}</span>
                 `;
                 container.appendChild(column);
 
