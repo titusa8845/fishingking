@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>義方金魚王：海洋世界排行版</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -95,6 +94,200 @@
         @keyframes bubbleRise {
             0% { background-position: 0 100%; }
             100% { background-position: 0 0%; }
+        }
+
+        /* --- Tailwind 替代 CSS --- */
+        * { box-sizing: border-box; }
+        html, body { padding: 0; }
+
+        .max-w-\[1400px\] { max-width: 1400px; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .p-4 { padding: 1rem; }
+        .p-6 { padding: 1.5rem; }
+        .p-8 { padding: 2rem; }
+        .px-8 { padding-left: 2rem; padding-right: 2rem; }
+        .px-20 { padding-left: 5rem; padding-right: 5rem; }
+        .py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+        .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+        .py-10 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+        .py-16 { padding-top: 4rem; padding-bottom: 4rem; }
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .py-5 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
+        .pl-1 { padding-left: 0.25rem; }
+        .pr-1 { padding-right: 0.25rem; }
+
+        .text-center { text-align: center; }
+        .text-white { color: white; }
+        .text-slate-300 { color: #cbd5e1; }
+        .text-slate-400 { color: #94a3b8; }
+        .text-slate-500 { color: #64748b; }
+        .text-slate-900 { color: #0f172a; }
+        .text-cyan-300 { color: #06b6d4; }
+        .text-cyan-400 { color: #06d6e9; }
+        .text-yellow-100 { color: #fef3c7; }
+        .text-yellow-400 { color: #facc15; }
+        .text-red-400 { color: #f87171; }
+        .text-slate-950 { color: #020617; }
+
+        .bg-cyan-400 { background-color: #06d6e9; }
+        .bg-cyan-500 { background-color: #0284c7; }
+        .bg-cyan-600 { background-color: #0369a1; }
+        .bg-slate-700 { background-color: #334155; }
+        .bg-slate-800 { background-color: #1e293b; }
+        .bg-slate-950 { background-color: #020617; }
+        .bg-yellow-400 { background-color: #facc15; }
+        .bg-yellow-500 { background-color: #eab308; }
+        .bg-red-600 { background-color: #dc2626; }
+        .bg-red-950 { background-color: #7c2d12; }
+        .bg-white { background-color: white; }
+
+        .border { border: 1px solid currentColor; }
+        .border-2 { border-width: 2px; }
+        .border-4 { border-width: 4px; }
+        .border-cyan-400 { border-color: #06d6e9; }
+        .border-slate-700 { border-color: #334155; }
+        .border-white { border-color: white; }
+        .border-red-500 { border-color: #ef4444; }
+
+        .rounded-2xl { border-radius: 1rem; }
+        .rounded-3xl { border-radius: 1.5rem; }
+        .rounded-\[30px\] { border-radius: 30px; }
+        .rounded-\[40px\] { border-radius: 40px; }
+        .rounded-\[50px\] { border-radius: 50px; }
+        .rounded-\[80px\] { border-radius: 80px; }
+        .rounded-full { border-radius: 9999px; }
+
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .gap-10 { gap: 2.5rem; }
+        .gap-12 { gap: 3rem; }
+
+        .grid { display: grid; }
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .col-span-full { grid-column: 1 / -1; }
+
+        .w-full { width: 100%; }
+        .w-24 { width: 6rem; }
+        .w-2 { width: 0.5rem; }
+        .min-w-\[200px\] { min-width: 200px; }
+        .h-8 { height: 2rem; }
+        .h-24 { height: 6rem; }
+        .h-\[15rem\] { height: 15rem; }
+
+        .font-bold { font-weight: 700; }
+        .font-black { font-weight: 900; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+        .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+        .text-5xl { font-size: 3rem; line-height: 1; }
+        .text-6xl { font-size: 3.75rem; line-height: 1; }
+        .text-7xl { font-size: 4.5rem; line-height: 1; }
+        .text-8xl { font-size: 6rem; line-height: 1; }
+        .text-9xl { font-size: 8rem; line-height: 1; }
+        .text-\[12px\] { font-size: 12px; }
+        .text-\[15rem\] { font-size: 15rem; }
+
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .mb-10 { margin-bottom: 2.5rem; }
+        .mb-12 { margin-bottom: 3rem; }
+        .mb-20 { margin-bottom: 5rem; }
+        .mb-24 { margin-bottom: 6rem; }
+        .mt-8 { margin-top: 2rem; }
+        .mt-10 { margin-top: 2.5rem; }
+        .mt-24 { margin-top: 6rem; }
+        .ml-6 { margin-left: 1.5rem; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+
+        .hidden { display: none; }
+        .block { display: block; }
+        .inline-block { display: inline-block; }
+        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .uppercase { text-transform: uppercase; }
+        .italic { font-style: italic; }
+        .tracking-tighter { letter-spacing: -0.05em; }
+        .tracking-\[0.4em\] { letter-spacing: 0.4em; }
+        .tracking-\[0.5em\] { letter-spacing: 0.5em; }
+        .leading-none { line-height: 1; }
+
+        .bg-clip-text { background-clip: text; -webkit-background-clip: text; }
+        .text-transparent { color: transparent; }
+        .bg-gradient-to-b { background-image: linear-gradient(to bottom, var(--tw-gradient-stops)); }
+        .from-yellow-100 { --tw-gradient-stops: #fef3c7, var(--tw-gradient-to, transparent); }
+        .to-yellow-500 { --tw-gradient-to: #eab308; }
+
+        .drop-shadow-2xl { filter: drop-shadow(0 25px 25px rgba(0, 0, 0, 0.25)); }
+        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+
+        .inset-0 { inset: 0; }
+        .fixed { position: fixed; }
+        .absolute { position: absolute; }
+        .relative { position: relative; }
+        .top-0 { top: 0; }
+        .bottom-0 { bottom: 0; }
+        .left-0 { left: 0; }
+        .right-0 { right: 0; }
+        .bottom-32 { bottom: 8rem; }
+        .pb-32 { padding-bottom: 8rem; }
+
+        .z-\[1000\] { z-index: 1000; }
+        .z-\[2000\] { z-index: 2000; }
+        .z-10 { z-index: 10; }
+        .z-\[-2\] { z-index: -2; }
+        .z-\[-1\] { z-index: -1; }
+
+        .backdrop-blur-xl { backdrop-filter: blur(20px); }
+        .backdrop-blur-2xl { backdrop-filter: blur(40px); }
+        .backdrop-blur-3xl { backdrop-filter: blur(64px); }
+
+        .outline-none { outline: 2px solid transparent; outline-offset: 2px; }
+        .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+        .active\:scale-95:active { transform: scale(0.95); }
+
+        .hover\:bg-cyan-400:hover { background-color: #06d6e9; }
+        .hover\:bg-red-500:hover { background-color: #ef4444; }
+        .hover\:bg-white\/10:hover { background-color: rgba(255, 255, 255, 0.1); }
+
+        .focus\:border-cyan-400:focus { border-color: #06d6e9; }
+
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        .space-y-12 > * + * { margin-top: 3rem; }
+
+        .pb-32 { padding-bottom: 8rem; }
+
+        /* Toast 通知 */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            z-index: 9999;
+            animation: slideIn 0.3s ease-out;
+            max-width: 400px;
+            word-wrap: break-word;
+        }
+
+        .toast.success { border-left: 4px solid #10b981; }
+        .toast.error { border-left: 4px solid #ef4444; }
+        .toast.info { border-left: 4px solid #0284c7; }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         /* 固定名次標籤 */
@@ -222,37 +415,132 @@
     </div>
 
     <script>
+        /**
+         * 義方金魚王排行榜應用
+         *
+         * 執行流程：
+         * 1️⃣ 初始化：讀取 GAS API 數據
+         * 2️⃣ 定期輪詢：每 5 秒檢查更新
+         * 3️⃣ 渲染排行榜：領獎台 + 列表
+         * 4️⃣ 用戶互動：提交成績、管理員面板
+         */
+
+        // ============ 配置常數 ============
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwzmoyqSBEL-C4SnzHsx9x03EWEn_gKR6XE4zOtPLt-5pYTjeVgrdczlPWlSqpY9XTF/exec";
+
+        /**
+         * 領獎台排序邏輯
+         * 實現 1, 2, 3 名在中間，周圍對稱遞減的視覺效果
+         * 左: 10, 8, 6, 4, 2 | 中: 1 | 右: 3, 5, 7, 9
+         */
+        const podiumOrder = [10, 8, 6, 4, 2, 1, 3, 5, 7, 9];
+        const ADMIN_PASSWORD = "1234"; // ⚠️ 應改為後端驗證
+
+        // ============ 應用狀態 ============
         let scores = [];
         let currentInputCount = 0;
-        const podiumOrder = [10, 8, 6, 4, 2, 1, 3, 5, 7, 9];
+        let isLoadingScores = false;
 
+        /**
+         * 驗證 Google Apps Script 響應格式
+         * 防止無效或惡意響應導致 UI 崩潰
+         *
+         * @param {any} data - API 返回的數據
+         * @returns {boolean} 驗證是否通過
+         */
+        function validateGASResponse(data) {
+            // 檢查是否為陣列
+            if (!Array.isArray(data)) {
+                console.error("GAS response 不是陣列:", data);
+                return false;
+            }
+
+            // 檢查元素結構
+            for (let i = 0; i < data.length; i++) {
+                const item = data[i];
+                if (!item.name || item.count === undefined) {
+                    console.error(`GAS response[${i}] 缺少必要欄位:`, item);
+                    return false;
+                }
+                // 驗證計數為數字且非負
+                if (typeof item.count !== 'number' || item.count < 0) {
+                    console.error(`GAS response[${i}] count 無效:`, item.count);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /**
+         * 獲取排行榜數據，自動差異檢測
+         * 避免無必要的重複渲染
+         */
         async function fetchScores() {
+            if (isLoadingScores) return; // 防止並發請求
+
             try {
+                isLoadingScores = true;
                 const res = await fetch(GAS_URL);
+
+                if (!res.ok) {
+                    showToast(`網路錯誤: ${res.status}`, 'error');
+                    return;
+                }
+
                 const data = await res.json();
+
+                // ✅ 驗證響應格式
+                if (!validateGASResponse(data)) {
+                    showToast('數據格式錯誤', 'error');
+                    return;
+                }
+
+                // 只在數據確實改變時渲染（避免閃爍）
                 if (JSON.stringify(data) !== JSON.stringify(scores)) {
                     scores = data;
                     renderPodium();
                     renderList();
                 }
-            } catch (err) { console.error("API Error", err); }
+            } catch (err) {
+                console.error("API 請求失敗:", err);
+                showToast('無法連線，請檢查網路', 'error');
+            } finally {
+                isLoadingScores = false;
+            }
         }
 
+        /**
+         * 渲染領獎台排行榜
+         *
+         * 執行流程：
+         * 1️⃣ 清空現有 DOM
+         * 2️⃣ 遍歷 podiumOrder（10→1→9 順序）
+         * 3️⃣ 查找對應排名的成績數據
+         * 4️⃣ 計算長條比例（相對於最高分）
+         * 5️⃣ 添加動畫延遲觸發填充效果
+         *
+         * @design 為什麼用 podiumOrder 排序？
+         * - 實現視覺對稱：1 名居中，2,3 左右，4,5 更外側...
+         * - 比直接排序更靈活，可自訂視覺層級
+         */
         function renderPodium() {
             const container = document.getElementById('podium');
             container.innerHTML = "";
+
+            // 找到最高分，用於計算條形相對高度
             const max = (scores[0] && scores[0].count > 0) ? scores[0].count : 0;
 
             podiumOrder.forEach(rank => {
                 const data = scores[rank - 1] || { name: "---", count: 0 };
                 const column = document.createElement('div');
                 column.className = `podium-column rank-column-${rank} ${rank === 1 ? 'rank-1-column scale-110 z-10' : ''}`;
+
+                // 計算填充高度百分比
                 const fillHeight = (max === 0 || data.count === 0) ? 0 : (data.count / max) * 100;
 
                 column.innerHTML = `
                     <div class="text-center mb-3 w-full">
-                        <span class="block text-[12px] font-bold text-slate-300 truncate px-1">${data.name}</span>
+                        <span class="block text-[12px] font-bold text-slate-300 truncate px-1">${escapeHtml(data.name)}</span>
                         <span class="oswald text-2xl font-bold neon-${rank}">${data.count}</span>
                     </div>
                     <div class="bar-wrapper">
@@ -261,6 +549,8 @@
                     <span class="rank-label neon-${rank}">${rank}</span>
                 `;
                 container.appendChild(column);
+
+                // 延遲觸發動畫，避免頁面同時執行所有動畫
                 setTimeout(() => {
                     const fill = document.getElementById(`bar-${rank}`);
                     if (fill) fill.style.height = `${fillHeight}%`;
@@ -268,21 +558,28 @@
             });
         }
 
+        /**
+         * 渲染排行榜列表（11+ 名）
+         *
+         * 顯示前 10 名外的挑戰者
+         */
         function renderList() {
             const listEl = document.getElementById('leaderboardList');
             listEl.innerHTML = "";
             const others = scores.slice(10);
+
             if (others.length === 0) {
                 listEl.innerHTML = `<li class="col-span-full py-16 text-center text-slate-500 italic text-2xl font-bold">海洋正在等待新的挑戰者...</li>`;
                 return;
             }
+
             others.forEach((p, idx) => {
                 const li = document.createElement('li');
                 li.className = "flex items-center justify-between bg-white/5 p-8 rounded-[30px] border border-white/5 hover:bg-white/10 transition-all";
                 li.innerHTML = `
                     <div class="flex items-center gap-6">
                         <span class="oswald text-slate-500 text-3xl font-bold">#${idx + 11}</span>
-                        <div class="font-black text-2xl text-white">${p.name}</div>
+                        <div class="font-black text-2xl text-white">${escapeHtml(p.name)}</div>
                     </div>
                     <div class="oswald text-4xl font-black text-slate-300">${p.count}</div>
                 `;
@@ -290,80 +587,286 @@
             });
         }
 
+        // ============ UI 工具函式 ============
+
+        /**
+         * 防止 XSS 攻擊 — 轉義 HTML 特殊字符
+         * @param {string} text - 要轉義的文本
+         * @returns {string} 轉義後的文本
+         */
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, c => map[c]);
+        }
+
+        /**
+         * 顯示 Toast 通知（替代 alert()）
+         * @param {string} message - 通知內容
+         * @param {string} type - 類型: 'success', 'error', 'info'
+         * @param {number} duration - 顯示時長（毫秒）
+         */
+        function showToast(message, type = 'info', duration = 3000) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            // 自動移除
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        /**
+         * 切換視圖（主頁 ↔ 回報 ↔ 管理）
+         * @param {string} view - 目標視圖: 'main', 'input', 'admin'
+         */
         function toggleView(view) {
+            // 隱藏所有彈窗
             document.getElementById('inputModal').classList.add('hidden');
             document.getElementById('adminModal').classList.add('hidden');
-            if (view === 'input') document.getElementById('inputModal').classList.remove('hidden');
-            if (view === 'admin') {
+
+            if (view === 'input') {
+                document.getElementById('inputModal').classList.remove('hidden');
+                // 重設表單
+                document.getElementById('playerName').value = '';
+                currentInputCount = 0;
+                document.getElementById('currentCount').innerText = '0';
+            } else if (view === 'admin') {
                 document.getElementById('adminModal').classList.remove('hidden');
                 document.getElementById('adminAuth').classList.remove('hidden');
                 document.getElementById('adminPanel').classList.add('hidden');
+                document.getElementById('adminPass').value = '';
             }
         }
 
+        /**
+         * 驗證管理員密碼
+         * ⚠️ 目前密碼在客戶端，應改為後端驗證
+         */
         function verifyAdmin() {
-            if (document.getElementById('adminPass').value === "1234") {
+            const pass = document.getElementById('adminPass').value;
+            if (pass === ADMIN_PASSWORD) {
                 document.getElementById('adminAuth').classList.add('hidden');
                 document.getElementById('adminPanel').classList.remove('hidden');
-            } else { alert("密碼錯誤！"); }
+            } else {
+                showToast('密碼錯誤！', 'error');
+            }
         }
 
-        async function resetLeaderboard() {
-            if (!confirm("確定要重置嗎？")) return;
-            try {
-                const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET", key: document.getElementById('adminPass').value }) });
-                if (await res.text() === "RESET_SUCCESS") { alert("已重置！"); location.reload(); }
-            } catch (err) { alert("重置失敗"); }
+        // ============ 成績管理 ============
+
+        /**
+         * 修改輸入計數
+         * @param {number} val - 增減值（可負數）
+         */
+        function changeCount(val) {
+            currentInputCount = Math.max(0, currentInputCount + val);
+            document.getElementById('currentCount').innerText = currentInputCount;
         }
 
-        function changeCount(val) { currentInputCount = Math.max(0, currentInputCount + val); document.getElementById('currentCount').innerText = currentInputCount; }
-
+        /**
+         * 提交玩家成績
+         *
+         * 執行流程：
+         * 1️⃣ 驗證輸入（玩家名稱、成績）
+         * 2️⃣ 禁用按鈕，顯示加載狀態
+         * 3️⃣ 發送 POST 請求到 GAS
+         * 4️⃣ 檢查是否觸發廣播（新紀錄）
+         * 5️⃣ 重載排行榜或播放廣播
+         */
         async function submitScore() {
+            // 驗證輸入
+            if (currentInputCount === 0) {
+                showToast('請輸入成績（> 0）', 'error');
+                return;
+            }
+
             const name = document.getElementById('playerName').value || "無名大師";
             const btn = document.getElementById('btnSubmit');
-            btn.disabled = true; btn.innerText = "傳送中...";
+
+            // 顯示加載狀態
+            btn.disabled = true;
+            btn.innerText = "傳送中...";
+
             try {
-                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "ADD_SCORE", name: name, count: currentInputCount }) });
-                if (currentInputCount >= 50 || (scores[0] && currentInputCount > scores[0].count)) { triggerBroadcast(name, currentInputCount); }
-                else { alert("回報成功！"); location.reload(); }
-            } catch (err) { alert("失敗"); btn.disabled = false; btn.innerText = "確認送出"; }
+                const res = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: "ADD_SCORE",
+                        name: name,
+                        count: currentInputCount
+                    })
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const responseText = await res.text();
+
+                // 檢查是否為新紀錄
+                if (currentInputCount >= 50 || (scores[0] && currentInputCount > scores[0].count)) {
+                    triggerBroadcast(name, currentInputCount);
+                } else {
+                    showToast('回報成功！', 'success');
+                    // 1 秒後重載
+                    setTimeout(() => location.reload(), 1000);
+                }
+            } catch (err) {
+                console.error("提交失敗:", err);
+                showToast('提交失敗，請檢查網路', 'error');
+                btn.disabled = false;
+                btn.innerText = "確認送出";
+            }
         }
 
+        /**
+         * 重置排行榜（管理員專用）
+         *
+         * ⚠️ 危險操作 — 二次確認
+         */
+        async function resetLeaderboard() {
+            // 二次確認
+            if (!confirm("⚠️ 確定要清空所有紀錄嗎？此動作無法復原")) return;
+
+            const btn = document.getElementById('btnReset');
+            btn.disabled = true;
+            btn.innerText = "處理中...";
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: "RESET",
+                        key: document.getElementById('adminPass').value
+                    })
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const responseText = await res.text();
+
+                if (responseText === "RESET_SUCCESS") {
+                    showToast('已重置所有紀錄', 'success');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showToast('重置失敗（密鑰無效）', 'error');
+                    btn.disabled = false;
+                    btn.innerText = "一鍵清空所有紀錄";
+                }
+            } catch (err) {
+                console.error("重置失敗:", err);
+                showToast('網路連線失敗', 'error');
+                btn.disabled = false;
+                btn.innerText = "一鍵清空所有紀錄";
+            }
+        }
+
+        // ============ 廣播與動畫 ============
+
+        /**
+         * 觸發新紀錄廣播
+         *
+         * 根據成績等級決定頭銜和評語
+         * @param {string} name - 玩家名稱
+         * @param {number} count - 成績
+         */
         function triggerBroadcast(name, count) {
             const overlay = document.getElementById('broadcastOverlay');
-            document.getElementById('b-name').innerText = name;
+            document.getElementById('b-name').innerText = escapeHtml(name);
             document.getElementById('b-count').innerText = count;
-            let title = "🌊 觀浪者"; let heckle = "只是來借廁所的吧？";
-            if (count >= 100) { title = "👾 水缸終結者"; heckle = "警報！水箱已爆裂，老闆準備轉行！"; }
-            else if (count >= 51) { title = "👑 義方金魚王"; heckle = "新王登基！全場尖叫聲！"; }
+
+            // 根據成績分級設定頭銜
+            let title = "🌊 觀浪者";
+            let heckle = "只是來借廁所的吧？";
+
+            if (count >= 100) {
+                title = "👾 水缸終結者";
+                heckle = "警報！水箱已爆裂，老闆準備轉行！";
+            } else if (count >= 51) {
+                title = "👑 義方金魚王";
+                heckle = "新王登基！全場尖叫聲！";
+            }
+
             document.getElementById('b-title').innerText = title;
             document.getElementById('b-heckle').innerText = heckle;
-            overlay.classList.remove('hidden'); overlay.classList.add('flex');
+
+            // 顯示廣播 6 秒後自動重載
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
             setTimeout(() => { location.reload(); }, 6000);
         }
 
-        fetchScores();
-        setInterval(fetchScores, 5000);
-
+        /**
+         * 背景動畫 — 游動的魚
+         *
+         * 參數說明：
+         * - 大小：30~70px（隨機）
+         * - 速度：15~35 秒（隨機，越快越激烈）
+         * - 位置：0~85% 垂直高度（避免超出視界）
+         * - 上下搖晃：4 秒週期（bobbing 效果）
+         */
         const fishEmojis = ['🐟', '🐠', '🐡', '🐙', '🦑', '🦐', '🦀', '🦈', '🐋', '🐳', '🧜‍♂️', '🧜‍♀️'];
         const bgContainer = document.getElementById('fishBackground');
+
+        /**
+         * 建立單隻游動的魚
+         * 設定隨機大小、速度、方向、高度
+         */
         function createFish() {
             const fish = document.createElement('div');
             const emoji = fishEmojis[Math.floor(Math.random() * fishEmojis.length)];
             const direction = Math.random() > 0.5 ? 'right' : 'left';
+
+            // 大小 30~70px
             const size = Math.floor(Math.random() * 40) + 30;
+
+            // 速度 15~35 秒橫越螢幕
             const duration = Math.floor(Math.random() * 20) + 15;
+
+            // 高度 0~85%
             const top = Math.floor(Math.random() * 85);
+
             fish.className = 'bg-fish';
             fish.innerText = emoji;
             fish.style.fontSize = `${size}px`;
             fish.style.top = `${top}%`;
+
+            // 組合橫移動畫 + 上下搖晃
             fish.style.animation = `${direction === 'right' ? 'swimRight' : 'swimLeft'} ${duration}s linear forwards, bobbing 4s ease-in-out infinite`;
+
             bgContainer.appendChild(fish);
+
+            // 動畫結束後移除 DOM（避免記憶體洩漏）
             setTimeout(() => { fish.remove(); }, duration * 1000);
         }
+
+        // ============ 初始化 & 定期更新 ============
+
+        // 載入初始數據
+        fetchScores();
+
+        // 每 5 秒輪詢一次排行榜
+        // 防止網路卡頓時過度請求（見 isLoadingScores 保護）
+        setInterval(fetchScores, 5000);
+
+        // 每 1.2 秒生成一隻魚（密度適中，不會過度渲染）
         setInterval(createFish, 1200);
-        for(let i=0; i<10; i++) setTimeout(createFish, Math.random() * 5000);
+
+        // 初始化時立即生成 10 隻魚（填滿背景）
+        for (let i = 0; i < 10; i++) {
+            setTimeout(createFish, Math.random() * 5000);
+        }
     </script>
 </body>
 </html>
