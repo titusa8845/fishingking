@@ -1202,9 +1202,17 @@
                 const isNew = lastSubmitted &&
                               p.name === lastSubmitted.name &&
                               p.count === lastSubmitted.count;
+                // 從前端 STUDENTS 陣列查找班級
+                const student = STUDENTS.find(s => s.name === p.name);
+                const classTag = student
+                    ? `<span style="font-size:1.6rem;font-weight:700;color:#67e8f9;background:rgba(6,182,212,0.15);border:2px solid rgba(6,182,212,0.4);padding:4px 16px;border-radius:20px;margin-left:20px;white-space:nowrap;">${escapeHtml(student.className)}</span>`
+                    : '';
                 li.className = `flex items-center justify-between bg-white/5 px-8 py-3 rounded-[20px] hover:bg-white/10 transition-all${isNew ? ' item-new-entry' : ''}`;
                 li.innerHTML = `
-                    <div class="font-black text-7xl text-white">${escapeHtml(p.name)}</div>
+                    <div class="flex items-center">
+                        <span class="font-black text-7xl text-white">${escapeHtml(p.name)}</span>
+                        ${classTag}
+                    </div>
                     <div class="oswald text-8xl font-black text-cyan-400">🎣 ${p.count}</div>
                 `;
                 listEl.appendChild(li);
