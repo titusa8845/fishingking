@@ -264,77 +264,124 @@
 
         .pb-32 { padding-bottom: 8rem; }
 
-        /* === 班級卡牌樣式 === */
-        .class-grid {
+        /* === 選人面板系統（移植自羽毛球借球系統）=== */
+        .fish-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            animation: fishPanelIn 0.25s ease;
+            text-align: left;
+        }
+
+        @keyframes fishPanelIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .fish-panel-header {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .fish-panel-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .fish-change-btn {
+            font-size: 13px;
+            font-weight: 700;
+            color: #2563eb;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        .fish-selected-info {
+            font-size: 26px;
+            font-weight: 800;
+            color: #111827;
+            text-align: center;
+            padding: 8px 0;
+        }
+
+        /* 班級卡牌：2 列網格 */
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
         }
 
         .class-btn {
-            padding: 18px 24px;
+            padding: 22px 12px;
             font-size: 18px;
             font-weight: 700;
             border: 3px solid #e5e7eb;
             border-radius: 16px;
             background: white;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
             text-align: center;
             color: #374151;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
         }
 
         .class-btn:hover {
             border-color: #2563eb;
             background: #dbeafe;
             transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.2);
         }
 
-        .class-btn:active {
-            transform: translateY(0);
-        }
+        .class-btn:active { transform: translateY(0); }
 
-        /* === 學生卡牌樣式 === */
+        /* 學生卡牌：2 列網格 */
         .student-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
         }
 
         .student-btn {
-            padding: 16px 24px;
-            font-size: 16px;
-            font-weight: 700;
-            border: 3px solid #e5e7eb;
-            border-radius: 16px;
+            padding: 16px 14px;
+            font-size: 18px;
+            font-weight: 600;
+            border: 2px solid #e5e7eb;
+            border-radius: 14px;
             background: white;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
             text-align: left;
             color: #374151;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 8px;
         }
 
         .student-btn:hover {
             border-color: #2563eb;
             background: #dbeafe;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.2);
         }
 
-        .student-btn:active {
-            transform: translateY(0);
-        }
+        .student-btn:active { transform: scale(0.97); }
 
-        .student-btn .seat {
-            color: #0284c7;
-            font-size: 18px;
-            font-weight: 800;
+        .seat {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            background: #dbeafe;
+            color: #2563eb;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
             flex-shrink: 0;
         }
 
@@ -549,38 +596,59 @@
     </div>
 
     <!-- 彈窗內容 (保持完整) -->
-    <div id="inputModal" class="fixed inset-0 bg-black/90 hidden flex flex-col items-center justify-center p-6 z-[1000] backdrop-blur-2xl overflow-y-auto">
-        <div class="w-full max-w-2xl text-center py-8">
-            <h2 class="text-5xl font-black mb-8 text-yellow-400">回報戰績</h2>
+    <div id="inputModal" class="fixed inset-0 bg-black/90 hidden flex flex-col items-start justify-start p-6 z-[1000] backdrop-blur-2xl overflow-y-auto">
+        <div class="w-full max-w-lg mx-auto py-8">
+            <h2 class="text-4xl font-black mb-6 text-yellow-400 text-center">回報戰績</h2>
 
-            <!-- 班級選擇區域 -->
-            <div id="classSelectionView" class="mb-12">
-                <p class="text-2xl text-cyan-300 mb-8 font-bold">📌 選擇班級</p>
-                <div id="classCardsContainer" class="mb-8"></div>
-                <button onclick="selectAnonymous()" class="w-full bg-slate-700 text-slate-300 font-bold py-4 rounded-2xl text-xl hover:bg-slate-600 transition-all mb-4">匿名送出</button>
-                <button onclick="toggleView('main')" class="w-full text-slate-400 font-bold py-4 text-xl hover:text-slate-200 transition-all">← 返回主頁</button>
+            <!-- ① 班級面板 -->
+            <div id="classPanelSelect" class="fish-panel">
+                <div class="fish-panel-header">
+                    <span class="fish-panel-label">🏫 ① 選擇班級</span>
+                </div>
+                <div id="classCardsContainer"></div>
+                <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+                    <button onclick="selectAnonymous()" style="width:100%;padding:12px;background:#f3f4f6;border:2px solid #e5e7eb;border-radius:12px;font-size:15px;font-weight:700;color:#6b7280;cursor:pointer;">匿名送出</button>
+                    <button onclick="toggleView('main')" style="width:100%;padding:10px;background:none;border:none;font-size:14px;font-weight:700;color:#9ca3af;cursor:pointer;">← 返回主頁</button>
+                </div>
             </div>
 
-            <!-- 學生選擇區域 -->
-            <div id="studentSelectionView" class="mb-12 hidden">
-                <button onclick="backToClassSelection()" class="text-cyan-400 font-bold text-lg mb-6 hover:text-cyan-300">← 回上一步</button>
-                <p id="selectedClassLabel" class="text-4xl text-slate-900 font-black text-center mb-10"></p>
-                <div id="studentCardsContainer" class="mb-8 max-h-96 overflow-y-auto"></div>
+            <!-- ① 班級已選（動態顯示） -->
+            <div id="classPanelDone" class="fish-panel hidden">
+                <div class="fish-panel-header">
+                    <span class="fish-panel-label">🏫 ① 班級</span>
+                    <button class="fish-change-btn" onclick="resetClassSelection()">🔄 重選</button>
+                </div>
+                <div id="selectedClassDisplay" class="fish-selected-info"></div>
             </div>
 
-            <!-- 已選擇/計數區域 -->
-            <div id="scoreInputView" class="hidden">
-                <p id="selectedStudentDisplay" class="text-6xl text-slate-900 font-black mb-8 text-center"></p>
-                <div class="flex items-center justify-center gap-12 mb-12">
-                    <button onclick="changeCount(-1)" class="w-24 h-24 bg-slate-700 rounded-full text-6xl font-bold">-</button>
+            <!-- ② 學生面板（動態顯示） -->
+            <div id="studentPanelSelect" class="fish-panel hidden">
+                <div class="fish-panel-header">
+                    <span class="fish-panel-label">🙋 ② 選擇學生</span>
+                </div>
+                <div id="studentCardsContainer" style="max-height:400px;overflow-y:auto;"></div>
+            </div>
+
+            <!-- ② 學生已選（動態顯示） -->
+            <div id="studentPanelDone" class="fish-panel hidden">
+                <div class="fish-panel-header">
+                    <span class="fish-panel-label">🙋 ② 學生</span>
+                    <button class="fish-change-btn" onclick="resetStudentSelection()">🔄 重選</button>
+                </div>
+                <div id="selectedStudentDisplay" class="fish-selected-info"></div>
+            </div>
+
+            <!-- ③ 計分面板（動態顯示） -->
+            <div id="scoreInputView" class="fish-panel hidden">
+                <div class="fish-panel-header">
+                    <span class="fish-panel-label">🎣 ③ 幾隻魚？</span>
+                </div>
+                <div class="flex items-center justify-center gap-12 mb-6" style="padding:16px 0;">
+                    <button onclick="changeCount(-1)" class="w-24 h-24 bg-slate-700 rounded-full text-6xl font-bold text-white">-</button>
                     <span id="currentCount" class="oswald text-9xl font-black min-w-[200px] text-cyan-400">0</span>
-                    <button onclick="changeCount(1)" class="w-24 h-24 bg-slate-700 rounded-full text-6xl font-bold">+</button>
+                    <button onclick="changeCount(1)" class="w-24 h-24 bg-slate-700 rounded-full text-6xl font-bold text-white">+</button>
                 </div>
-                <div class="flex flex-col gap-6">
-                    <button onclick="submitScore()" id="btnSubmit" class="bg-yellow-500 text-slate-950 font-black py-8 rounded-[30px] text-4xl shadow-2xl active:scale-95">確認送出</button>
-                    <button onclick="changeStudent()" class="bg-slate-700 text-slate-300 font-bold py-6 rounded-2xl text-2xl hover:bg-slate-600 transition-all active:scale-95">👤 更換學生</button>
-                    <button onclick="toggleView('main')" class="text-slate-400 font-bold text-2xl py-4">返回主頁</button>
-                </div>
+                <button onclick="submitScore()" id="btnSubmit" class="w-full bg-yellow-500 text-slate-950 font-black py-6 rounded-2xl text-3xl shadow-2xl active:scale-95">確認送出 🎣</button>
             </div>
 
             <!-- 隱藏的表單欄位 -->
@@ -1136,85 +1204,88 @@
         let selectedClassName = null;
 
         /**
-         * 初始化班級選擇卡片
+         * 初始化班級選擇（重設所有 panel 到初始狀態）
          */
         function initializeClassSelection() {
-            // 隱藏學生和計數視圖
-            document.getElementById('classSelectionView').classList.remove('hidden');
-            document.getElementById('studentSelectionView').classList.add('hidden');
+            document.getElementById('classPanelSelect').classList.remove('hidden');
+            document.getElementById('classPanelDone').classList.add('hidden');
+            document.getElementById('studentPanelSelect').classList.add('hidden');
+            document.getElementById('studentPanelDone').classList.add('hidden');
             document.getElementById('scoreInputView').classList.add('hidden');
+            selectedClassName = null;
 
-            // 獲取唯一的班級清單
-            const classNames = [...new Set(STUDENTS.map(s => s.className))].sort();
-
-            // 生成班級卡片（整列）
+            // 生成班級卡牌（2列網格）
             const container = document.getElementById('classCardsContainer');
             container.className = 'class-grid';
-            container.innerHTML = classNames.map(className => `
-                <button onclick="selectClass('${className}')" class="class-btn">
-                    ${className}
-                </button>
+            const classNames = [...new Set(STUDENTS.map(s => s.className))].sort();
+            container.innerHTML = classNames.map(name => `
+                <button onclick="selectClass('${name}')" class="class-btn">${name}</button>
             `).join('');
         }
 
         /**
-         * 選擇班級，顯示該班學生
+         * 選班級：班級選擇 panel 收合為確認，展開學生選擇 panel
          */
         function selectClass(className) {
             selectedClassName = className;
 
-            // 隱藏班級視圖，顯示學生視圖
-            document.getElementById('classSelectionView').classList.add('hidden');
-            document.getElementById('studentSelectionView').classList.remove('hidden');
+            // 班級收合為確認
+            document.getElementById('classPanelSelect').classList.add('hidden');
+            document.getElementById('classPanelDone').classList.remove('hidden');
+            document.getElementById('selectedClassDisplay').innerText = className;
 
-            // 更新標題
-            document.getElementById('selectedClassLabel').innerText = className;
+            // 展開學生選擇 panel
+            document.getElementById('studentPanelSelect').classList.remove('hidden');
 
-            // 取得該班學生並生成卡片（整列卡牌）
+            // 生成學生卡牌（2列網格）
             const classStudents = STUDENTS.filter(s => s.className === className);
             const container = document.getElementById('studentCardsContainer');
             container.className = 'student-grid';
-            container.innerHTML = classStudents.map(student => `
-                <button onclick="selectStudent('${student.name}')" class="student-btn">
-                    <span class="seat">${String(student.seatNumber).padStart(2, '0')}</span>
-                    <span>${student.name}</span>
+            container.innerHTML = classStudents.map(s => `
+                <button onclick="selectStudent('${s.name}')" class="student-btn">
+                    <span class="seat">${String(s.seatNumber).padStart(2, '0')}</span>
+                    <span>${s.name}</span>
                 </button>
             `).join('');
+
+            // 平滑滾動到學生面板
+            document.getElementById('studentPanelSelect').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         /**
-         * 選擇學生，進入計分視圖
+         * 選學生：學生選擇 panel 收合為確認，展開計分 panel
          */
         function selectStudent(studentName) {
             document.getElementById('playerName').value = studentName;
 
-            // 隱藏班級和學生視圖，顯示計數視圖
-            document.getElementById('classSelectionView').classList.add('hidden');
-            document.getElementById('studentSelectionView').classList.add('hidden');
-            document.getElementById('scoreInputView').classList.remove('hidden');
-
-            // 顯示已選擇的學生（大字）
+            // 學生收合為確認
+            document.getElementById('studentPanelSelect').classList.add('hidden');
+            document.getElementById('studentPanelDone').classList.remove('hidden');
             document.getElementById('selectedStudentDisplay').innerText = studentName;
 
-            // 重置計數
+            // 展開計分 panel
+            document.getElementById('scoreInputView').classList.remove('hidden');
             currentInputCount = 0;
             document.getElementById('currentCount').innerText = '0';
+
+            document.getElementById('scoreInputView').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         /**
-         * 返回班級選擇
+         * 重選班級
          */
-        function backToClassSelection() {
-            document.getElementById('studentSelectionView').classList.add('hidden');
-            document.getElementById('classSelectionView').classList.remove('hidden');
-            selectedClassName = null;
-        }
-
-        /**
-         * 更換學生（返回班級列表）
-         */
-        function changeStudent() {
+        function resetClassSelection() {
             initializeClassSelection();
+        }
+
+        /**
+         * 重選學生
+         */
+        function resetStudentSelection() {
+            document.getElementById('studentPanelDone').classList.add('hidden');
+            document.getElementById('scoreInputView').classList.add('hidden');
+            document.getElementById('studentPanelSelect').classList.remove('hidden');
+            document.getElementById('studentPanelSelect').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         /**
@@ -1222,9 +1293,12 @@
          */
         function selectAnonymous() {
             document.getElementById('playerName').value = '';
-            document.getElementById('classSelectionView').classList.add('hidden');
+            document.getElementById('classPanelSelect').classList.add('hidden');
+            document.getElementById('classPanelDone').classList.remove('hidden');
+            document.getElementById('selectedClassDisplay').innerText = '匿名';
+            document.getElementById('studentPanelDone').classList.remove('hidden');
+            document.getElementById('selectedStudentDisplay').innerText = '匿名玩家';
             document.getElementById('scoreInputView').classList.remove('hidden');
-            document.getElementById('selectedStudentDisplay').innerText = '🎣 匿名玩家';
             currentInputCount = 0;
             document.getElementById('currentCount').innerText = '0';
         }
@@ -1299,10 +1373,8 @@
                     btn.disabled = false;
                     btn.innerText = "確認送出";
 
-                    // 清空輸入欄（保持彈窗開啟，方便繼續輸入）
-                    document.getElementById('playerName').value = '';
-                    currentInputCount = 0;
-                    document.getElementById('currentCount').innerText = "0";
+                    // 送出成功後重回班級選擇，方便繼續為下一個學生回報
+                    initializeClassSelection();
 
                     // 等 GAS 寫入後立即拉取新數據
                     setTimeout(fetchScores, 500);
