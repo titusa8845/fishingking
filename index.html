@@ -1232,11 +1232,11 @@
             document.getElementById('scoreInputView').classList.add('hidden');
             selectedClassName = null;
 
-            // 生成班級卡牌（2列網格）
+            // 生成班級卡牌（固定順序：一至六年）
             const container = document.getElementById('classCardsContainer');
             container.className = 'class-grid';
-            const classNames = [...new Set(STUDENTS.map(s => s.className))].sort();
-            container.innerHTML = classNames.map(name => `
+            const classOrder = ['一年忠班','二年忠班','三年忠班','四年忠班','五年忠班','六年忠班'];
+            container.innerHTML = classOrder.map(name => `
                 <button onclick="selectClass('${name}')" class="class-btn">${name}</button>
             `).join('');
         }
