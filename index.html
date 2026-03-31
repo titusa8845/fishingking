@@ -326,6 +326,19 @@
         .parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 20s; }
         @keyframes move-forever { 0% { transform: translate3d(-90px,0,0); } 100% { transform: translate3d(85px,0,0); } }
 
+        /* 獎牌卡彈出動畫 */
+        @keyframes medalPop {
+            0%   { opacity: 0; transform: scale(0.5); }
+            60%  { transform: scale(1.05); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes medalFade {
+            0%   { opacity: 1; }
+            100% { opacity: 0; transform: scale(0.9); }
+        }
+        .medal-card-enter { animation: medalPop 0.4s ease-out forwards; }
+        .medal-card-exit  { animation: medalFade 0.5s ease-in forwards; }
+
         /* 新項目進入動畫 + 青色光暈 */
         @keyframes slideInDownWithGlow {
             0% {
@@ -442,6 +455,24 @@
         </div>
     </div>
 
+    <!-- 獎牌卡彈出 -->
+    <div id="medalCard" class="fixed inset-0 flex items-center justify-center z-[2500] pointer-events-none hidden">
+        <div id="medalCardInner" class="relative rounded-[40px] overflow-hidden p-12 text-center"
+             style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+                    border: 3px solid #fbbf24;
+                    box-shadow: 0 0 40px rgba(251,191,36,0.4), inset 0 0 40px rgba(251,191,36,0.05);
+                    min-width: 380px;">
+            <h2 id="mc-name" class="font-black text-6xl text-white italic mb-6 drop-shadow-2xl"></h2>
+            <div class="oswald mb-6" style="color:#fbbf24">
+                <span id="mc-count" class="text-[10rem] font-black leading-none"></span>
+                <span class="text-4xl ml-4">FISH</span>
+            </div>
+            <div id="mc-title" class="inline-block font-black text-5xl px-12 py-6 rounded-[30px]"
+                 style="background:#fbbf24; color:#0f172a"></div>
+            <div id="mc-rank-badge" class="mt-8 text-4xl font-black" style="color:#fbbf24"></div>
+        </div>
+    </div>
+
     <div id="broadcastOverlay" class="fixed inset-0 bg-black/98 hidden flex-col items-center justify-center p-6 text-center z-[2000]">
         <div class="animate-pulse mb-12 text-7xl font-black text-yellow-400 tracking-[0.5em]">NEW RECORD</div>
         <div class="bg-white/5 p-24 rounded-[80px] border border-white/10 shadow-2xl backdrop-blur-3xl">
@@ -513,6 +544,7 @@
         let currentInputCount = 0;
         let isLoadingScores = false;
         let lastSubmitted = null; // 記錄最近提交的玩家 { name, count }，用於動畫識別
+        let previousRanked = []; // 上次的排名快照，用於偵測排名變動
 
         /**
          * 驗證 Google Apps Script 響應格式
@@ -573,8 +605,39 @@
 
                 // 只在數據確實改變時渲染（避免閃爍）
                 if (JSON.stringify(data) !== JSON.stringify(scores)) {
+                    // 在數據更新前，計算排名變動並決定是否觸發獎牌卡
+                    if (lastSubmitted) {
+                        const newRanked = [...data].sort((a, b) => b.count - a.count);
+                        const newRankIdx = newRanked.findIndex(p =>
+                            p.name === lastSubmitted.name && p.count === lastSubmitted.count
+                        );
+                        const newRank = newRankIdx + 1;
+
+                        const prevRankIdx = previousRanked.findIndex(p =>
+                            p.name === lastSubmitted.name && p.count === lastSubmitted.count
+                        );
+                        const prevRank = prevRankIdx === -1 ? 999 : prevRankIdx + 1;
+
+                        if (newRank > 0) {
+                            const isTop10Entry  = newRank <= 10 && prevRank > 10;
+                            const isTop3Entry   = newRank <= 3  && prevRank > 3;
+                            const hasRankUp     = prevRank !== 999 && newRank < prevRank;
+
+                            if (isTop3Entry || isTop10Entry || hasRankUp) {
+                                const playerData = newRanked[newRankIdx];
+                                triggerMedalCard(playerData.name, playerData.count, newRank, playerData.title);
+                            }
+                        }
+                        // 觸發後清除 lastSubmitted，避免 5 秒輪詢誤觸發
+                        lastSubmitted = null;
+                    }
+
                     scores = data;
                     console.log(`✅ 數據已更新 (${data.length} 筆)，開始渲染...`);
+
+                    // 更新前次排名快照
+                    previousRanked = [...data].sort((a, b) => b.count - a.count);
+
                     renderPodium();
                     renderList();
                 } else {
@@ -839,6 +902,44 @@
             document.getElementById('playerName').value = '';
             currentInputCount = 0;
             document.getElementById('currentCount').innerText = "0";
+        }
+
+        /**
+         * 觸發獎牌卡彈出
+         * @param {string} name - 玩家名字
+         * @param {number} count - 分數
+         * @param {number} rank - 目前排名
+         * @param {string} title - 稱號
+         */
+        function triggerMedalCard(name, count, rank, title) {
+            const rankMsg = rank === 1 ? '🥇 登上第一名！' :
+                            rank === 2 ? '🥈 榮登第二名！' :
+                            rank === 3 ? '🥉 進入前三名！' :
+                                         `🎉 擠進第 ${rank} 名！`;
+
+            document.getElementById('mc-name').innerText = escapeHtml(name);
+            document.getElementById('mc-count').innerText = count;
+            document.getElementById('mc-title').innerText = title || '🌊 觀浪者';
+            document.getElementById('mc-rank-badge').innerText = rankMsg;
+
+            const card = document.getElementById('medalCard');
+            const inner = document.getElementById('medalCardInner');
+
+            // 重置動畫
+            inner.classList.remove('medal-card-enter', 'medal-card-exit');
+            card.classList.remove('hidden');
+
+            // 觸發彈出動畫
+            requestAnimationFrame(() => {
+                inner.classList.add('medal-card-enter');
+            });
+
+            // 3 秒後淡出
+            setTimeout(() => {
+                inner.classList.remove('medal-card-enter');
+                inner.classList.add('medal-card-exit');
+                setTimeout(() => { card.classList.add('hidden'); }, 500);
+            }, 3000);
         }
 
         /**
