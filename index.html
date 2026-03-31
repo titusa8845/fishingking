@@ -545,7 +545,11 @@
             const max = (scores[0] && scores[0].count > 0) ? scores[0].count : 0;
 
             podiumOrder.forEach(rank => {
-                const data = scores[rank - 1] || { name: "---", count: 0 };
+                const data = scores[rank - 1];
+
+                // 只在有數據時才渲染該排名列
+                if (!data) return;
+
                 const column = document.createElement('div');
                 column.className = `podium-column rank-column-${rank} ${rank === 1 ? 'rank-1-column scale-110 z-10' : ''}`;
 
