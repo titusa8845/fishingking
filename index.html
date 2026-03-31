@@ -51,13 +51,12 @@
         .bar-wrapper {
             width: 100%;
             height: 320px;
+            flex-shrink: 0; /* 防止 flex 壓縮，確保所有 column bar 等高基準 */
             position: relative;
             background: transparent;
             border-top-left-radius: 12px;
             border-top-right-radius: 12px;
             overflow: hidden;
-            /* 移除邊框：讓長條圖更突出 */
-            /* 移除 animation: seaweedSway */
         }
 
         /* 移除原有的晃動錯開設定 */
@@ -434,6 +433,7 @@
             font-weight: 900;
             opacity: 1;
             height: 60px;
+            flex-shrink: 0; /* 防止 flex 壓縮 */
             display: flex;
             align-items: center;
             justify-content: center;
