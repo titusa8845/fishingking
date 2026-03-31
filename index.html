@@ -605,6 +605,13 @@
             <span id="broadcastText" class="broadcast-text">🎙️ 主播：各位！現在戰況非常激烈！</span>
         </div>
 
+        <!-- 階段 C 動態事件插播橫幅 -->
+        <div id="eventBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;padding:0 24px;pointer-events:none;">
+            <div id="eventBannerInner" style="background:linear-gradient(90deg,#0f172a,#1e3a5f,#0f172a);border-bottom:3px solid #06b6d4;padding:18px 40px;text-align:center;font-family:'Noto Sans TC',sans-serif;font-size:2.4rem;font-weight:900;color:#fff;letter-spacing:0.05em;text-shadow:0 0 20px #06b6d4;box-shadow:0 8px 40px rgba(6,182,212,0.4);">
+                <span id="eventBannerText"></span>
+            </div>
+        </div>
+
         <section id="podium" class="podium-container"></section>
 
         <section class="bg-slate-950/40 border border-white/10 rounded-[40px] p-8 md:p-10 backdrop-blur-xl mb-20 shadow-2xl">
@@ -1092,8 +1099,12 @@
                             }
 
                             console.log(`🎙️ [事件追蹤] eventMessage="${eventMessage}"`);
-                            // 有事件訊息時立刻插播，並重置計時器確保顯示完整 5 秒
-                            if (eventMessage) { rotateMessage(); scheduleBroadcast(); }
+                            // 有事件訊息時：跑馬燈 + 醒目插播橫幅（頂端滑入）
+                            if (eventMessage) {
+                                rotateMessage();
+                                scheduleBroadcast();
+                                triggerEventBanner(eventMessage);
+                            }
                         } else {
                             console.log(`⏳ [事件追蹤] 玩家尚未出現在數據，下輪再試`);
                         }
@@ -1677,6 +1688,38 @@
             broadcastText.innerText = getNextMessage();
             // 恢復動畫
             broadcastText.style.animation = '';
+        }
+
+        /**
+         * 觸發階段 C 動態事件插播橫幅
+         * 從畫面頂端滑入，停留 4 秒後消失
+         */
+        let eventBannerTimeout = null;
+        function triggerEventBanner(msg) {
+            const banner = document.getElementById('eventBanner');
+            const inner  = document.getElementById('eventBannerInner');
+            const text   = document.getElementById('eventBannerText');
+
+            // 清掉上一次還沒消失的
+            clearTimeout(eventBannerTimeout);
+            text.innerText = msg;
+
+            // 滑入
+            banner.style.display = 'block';
+            inner.style.transition = 'none';
+            inner.style.transform = 'translateY(-100%)';
+            inner.style.opacity = '0';
+            void inner.offsetHeight;
+            inner.style.transition = 'transform 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.4s';
+            inner.style.transform = 'translateY(0)';
+            inner.style.opacity = '1';
+
+            // 4 秒後滑出
+            eventBannerTimeout = setTimeout(() => {
+                inner.style.transform = 'translateY(-100%)';
+                inner.style.opacity = '0';
+                setTimeout(() => { banner.style.display = 'none'; }, 450);
+            }, 4000);
         }
 
         // 可重置的廣播計時器（事件插播後重新計時，確保訊息完整顯示 5 秒）
