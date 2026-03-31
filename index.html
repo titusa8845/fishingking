@@ -360,7 +360,7 @@
             font-size: 1.25rem;
             font-weight: bold;
             color: #06b6d4;
-            animation: marquee 8s linear infinite;
+            animation: marquee 5s linear forwards;
         }
 
         /* 新項目進入動畫 + 青色光暈 */
@@ -1190,7 +1190,7 @@
 
         // 初始化廣播訊息
         rotateMessage();
-        // 每 5 秒換一句（與 marquee 8s 動畫配合，每 5 秒重置一次）
+        // 每 5 秒換一句（marquee 動畫 5s，完全滑完後換新訊息）
         setInterval(rotateMessage, 5000);
 
         // 載入初始數據
