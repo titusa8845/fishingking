@@ -561,23 +561,57 @@
         };
 
         /**
-         * 廣播訊息池
+         * 智慧廣播訊息池（三階段）
          */
-        const broadcastMessages = [
+        // 階段 1：開場歡迎（人數 < 10）
+        const MSG_WELCOME = [
+            '🎙️ 主播：歡迎來到義方金魚王大賽！',
+            '🎙️ 主播：今天誰是最強的撈魚達人？',
+            '🎪 活動：歡迎各位英雄好漢入場！',
+            '🎙️ 主播：挑戰者們正在熱身中...',
+            '🎪 活動：場地準備就緒，選手們準備好了嗎？',
+            '🎙️ 主播：今天的義方夜市，將誕生新的傳說！',
+        ];
+
+        // 階段 2：激烈戰況（人數 >= 10）
+        const MSG_BATTLE = [
             '🎙️ 主播：各位！現在戰況非常激烈！',
             '🎙️ 主播：有人要逆轉勝嗎？',
+            '🎙️ 主播：現在誰是金魚王？拭目以待！',
+            '🎙️ 主播：水準越來越高啦！',
             '👨‍🍳 攤販：你阿嬤都比你厲害，連鮮蝦都捲起來了！',
             '👨‍🍳 攤販：欸不是，這什麼速度啦，蝦子都跑掉了啦！',
             '👨‍🍳 攤販：連我家的貓都捉得比你多啦！',
+            '👨‍🍳 攤販：欸你看，這隻連自己都不知道怎麼活的！',
+            '👨‍🍳 攤販：你是在撈回憶嗎？這速度感動天地！',
             '👥 觀眾：哇！又有人上榜了！',
             '👥 觀眾：喔喔喔～～',
-            '🎙️ 主播：現在誰是金魚王？拭目以待！',
-            '👨‍🍳 攤販：欸你看，這隻連自己都不知道怎麼活的！',
             '👥 觀眾：哈哈哈哈～～',
-            '🎙️ 主播：水準越來越高啦！',
-            '👨‍🍳 攤販：我的天哪，你這手速根本天才啦！',
+            '👥 觀眾：加油啊！你可以的啦！',
         ];
-        let currentMessageIndex = 0;
+
+        // 階段 3：動態事件（優先廣播，由排名變動觸發）
+        let eventMessage = null;
+        let welcomeIndex = 0;
+        let battleIndex = 0;
+
+        function getNextMessage() {
+            // 1️⃣ 動態事件優先
+            if (eventMessage) {
+                const msg = eventMessage;
+                eventMessage = null;
+                return msg;
+            }
+            // 2️⃣ 依人數選分類
+            if (scores.length < 10) {
+                const msg = MSG_WELCOME[welcomeIndex % MSG_WELCOME.length];
+                welcomeIndex++;
+                return msg;
+            }
+            const msg = MSG_BATTLE[battleIndex % MSG_BATTLE.length];
+            battleIndex++;
+            return msg;
+        }
 
         /**
          * 領獎台排序邏輯
@@ -670,10 +704,33 @@
                             const isTop10Entry  = newRank <= 10 && prevRank > 10;
                             const isTop3Entry   = newRank <= 3  && prevRank > 3;
                             const hasRankUp     = prevRank !== 999 && newRank < prevRank;
+                            const isRank1Entry  = newRank === 1  && prevRank !== 1;
 
-                            if (isTop3Entry || isTop10Entry || hasRankUp) {
+                            if (isTop3Entry || isTop10Entry || hasRankUp || isRank1Entry) {
                                 const playerData = newRanked[newRankIdx];
                                 triggerMedalCard(playerData.name, playerData.count, newRank, playerData.title);
+                            }
+
+                            // 🎙️ 動態事件廣播（優先插隊）
+                            const playerData = newRanked[newRankIdx];
+                            const playerName = playerData.name;
+                            const playerCount = playerData.count;
+
+                            // 優先順序 1：登上第一名
+                            if (isRank1Entry) {
+                                eventMessage = `🎙️ 主播：${playerName} 登上王座！目前 ${playerCount} 隻！這是義方金魚王嗎？！`;
+                            }
+                            // 優先順序 2：進入前 3 名
+                            else if (isTop3Entry) {
+                                eventMessage = `👥 觀眾：${playerName} 殺進前三名！！！`;
+                            }
+                            // 優先順序 3：超車（排名提升）
+                            else if (hasRankUp) {
+                                eventMessage = `🎙️ 主播：${playerName} 超車了！從第 ${prevRank} 名衝到第 ${newRank} 名！`;
+                            }
+                            // 優先順序 4：新人擠進前 10
+                            else if (isTop10Entry) {
+                                eventMessage = `🎙️ 主播：${playerName} 剛剛殺進前十！帶著 ${playerCount} 隻魚！`;
                             }
                         }
                         // 觸發後清除 lastSubmitted，避免 5 秒輪詢誤觸發
@@ -1117,17 +1174,24 @@
 
         /**
          * 廣播訊息輪換
+         * 重置動畫以支援連續滾動
          */
         function rotateMessage() {
             const broadcastText = document.getElementById('broadcastText');
-            broadcastText.innerText = broadcastMessages[currentMessageIndex];
-            currentMessageIndex = (currentMessageIndex + 1) % broadcastMessages.length;
+            // 重置動畫
+            broadcastText.style.animation = 'none';
+            // 觸發重排以應用動畫重置
+            void broadcastText.offsetHeight;
+            // 更新文字內容
+            broadcastText.innerText = getNextMessage();
+            // 恢復動畫
+            broadcastText.style.animation = '';
         }
 
         // 初始化廣播訊息
         rotateMessage();
-        // 每 9 秒換一句（跑馬燈動畫 8 秒 + 1 秒間隔）
-        setInterval(rotateMessage, 9000);
+        // 每 5 秒換一句（與 marquee 8s 動畫配合，每 5 秒重置一次）
+        setInterval(rotateMessage, 5000);
 
         // 載入初始數據
         fetchScores();
