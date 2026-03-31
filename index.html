@@ -1130,10 +1130,12 @@
                 if (!data) return;
 
                 const column = document.createElement('div');
-                column.className = `podium-column rank-column-${rank} ${rank === 1 ? 'rank-1-column scale-110 z-10' : ''}`;
+                column.className = `podium-column rank-column-${rank} ${rank === 1 ? 'rank-1-column z-10' : ''}`;
 
-                // 計算填充高度百分比
-                const fillHeight = (max === 0 || data.count === 0) ? 0 : (data.count / max) * 100;
+                // 計算填充高度：最低 20%，最高 100%，拉開視覺差距
+                const fillHeight = (max === 0 || data.count === 0)
+                    ? 5
+                    : 20 + ((data.count / max) ** 0.6) * 80;
 
                 const glowClass = rank <= 3 ? `glow-rank-${rank}` : '';
                 column.innerHTML = `
