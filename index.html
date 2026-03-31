@@ -479,22 +479,24 @@
         <div class="w-full max-w-2xl text-center py-8">
             <h2 class="text-5xl font-black mb-8 text-yellow-400">回報戰績</h2>
 
-            <!-- 班級選擇或學生選擇區域 -->
+            <!-- 班級選擇區域 -->
             <div id="classSelectionView" class="mb-12">
-                <p class="text-2xl text-cyan-300 mb-6 font-bold">選擇班級</p>
+                <p class="text-2xl text-cyan-300 mb-8 font-bold">📌 選擇班級</p>
                 <div id="classCardsContainer" class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8"></div>
                 <button onclick="selectAnonymous()" class="w-full bg-slate-700 text-slate-300 font-bold py-4 rounded-2xl text-xl hover:bg-slate-600 transition-all">匿名送出</button>
             </div>
 
+            <!-- 學生選擇區域 -->
             <div id="studentSelectionView" class="mb-12 hidden">
                 <button onclick="backToClassSelection()" class="text-cyan-400 font-bold text-lg mb-6 hover:text-cyan-300">← 回上一步</button>
-                <p id="selectedClassLabel" class="text-2xl text-cyan-300 mb-6 font-bold"></p>
-                <div id="studentCardsContainer" class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8 max-h-96 overflow-y-auto"></div>
+                <p id="selectedClassLabel" class="text-4xl text-cyan-400 font-black text-center mb-8"></p>
+                <p class="text-xl text-cyan-300 mb-6 font-bold">👤 選擇學生</p>
+                <div id="studentCardsContainer" class="flex flex-col gap-3 mb-8 max-h-96 overflow-y-auto"></div>
             </div>
 
             <!-- 已選擇/計數區域 -->
             <div id="scoreInputView" class="hidden">
-                <p id="selectedStudentDisplay" class="text-3xl text-cyan-300 font-bold mb-8"></p>
+                <p id="selectedStudentDisplay" class="text-6xl text-blue-400 font-black mb-8 text-center"></p>
                 <div class="flex items-center justify-center gap-12 mb-12">
                     <button onclick="changeCount(-1)" class="w-24 h-24 bg-slate-700 rounded-full text-6xl font-bold">-</button>
                     <span id="currentCount" class="oswald text-9xl font-black min-w-[200px] text-cyan-400">0</span>
@@ -1093,13 +1095,13 @@
             // 更新標題
             document.getElementById('selectedClassLabel').innerText = className;
 
-            // 取得該班學生並生成卡片
+            // 取得該班學生並生成卡片（整列）
             const classStudents = STUDENTS.filter(s => s.className === className);
             const container = document.getElementById('studentCardsContainer');
             container.innerHTML = classStudents.map(student => `
-                <button onclick="selectStudent('${student.name}')" class="bg-gradient-to-b from-yellow-600 to-yellow-700 hover:from-yellow-500 hover:to-yellow-600 text-white font-black py-6 rounded-2xl text-lg transition-all active:scale-95 shadow-lg">
-                    <div class="text-sm opacity-75">座號${student.seatNumber}</div>
-                    <div>${student.name}</div>
+                <button onclick="selectStudent('${student.name}')" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-black py-5 px-6 rounded-2xl text-xl transition-all active:scale-95 shadow-lg text-left flex items-center gap-4">
+                    <span class="text-cyan-300 text-2xl font-bold">${String(student.seatNumber).padStart(2, '0')}</span>
+                    <span>${student.name}</span>
                 </button>
             `).join('');
         }
@@ -1115,8 +1117,8 @@
             document.getElementById('studentSelectionView').classList.add('hidden');
             document.getElementById('scoreInputView').classList.remove('hidden');
 
-            // 顯示已選擇的學生
-            document.getElementById('selectedStudentDisplay').innerText = `🎣 ${studentName}`;
+            // 顯示已選擇的學生（大字）
+            document.getElementById('selectedStudentDisplay').innerText = studentName;
 
             // 重置計數
             currentInputCount = 0;
