@@ -1191,7 +1191,7 @@
                 const isNew = lastSubmitted &&
                               p.name === lastSubmitted.name &&
                               p.count === lastSubmitted.count;
-                li.className = `flex items-center justify-between bg-white/5 p-8 rounded-[30px] hover:bg-white/10 transition-all${isNew ? ' item-new-entry' : ''}`;
+                li.className = `flex items-center justify-between bg-white/5 px-8 py-3 rounded-[20px] hover:bg-white/10 transition-all${isNew ? ' item-new-entry' : ''}`;
                 li.innerHTML = `
                     <div class="font-black text-7xl text-white">${escapeHtml(p.name)}</div>
                     <div class="oswald text-8xl font-black text-cyan-400">🎣 ${p.count}</div>
