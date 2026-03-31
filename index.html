@@ -410,7 +410,7 @@
     <div id="inputModal" class="fixed inset-0 bg-black/90 hidden flex flex-col items-center justify-center p-6 z-[1000] backdrop-blur-2xl">
         <div class="w-full max-w-lg text-center">
             <h2 class="text-5xl font-black mb-12 text-yellow-400">回報戰績</h2>
-            <input type="text" id="playerName" placeholder="你的暱稱" class="bg-slate-800 border-4 border-slate-700 p-8 rounded-3xl w-full text-center text-4xl mb-12 outline-none focus:border-cyan-400 text-white font-bold">
+            <input type="text" id="playerName" placeholder="你的暱稱 (最多8字)" maxlength="8" class="bg-slate-800 border-4 border-slate-700 p-8 rounded-3xl w-full text-center text-4xl mb-12 outline-none focus:border-cyan-400 text-white font-bold">
             <div class="flex items-center justify-center gap-12 mb-12">
                 <button onclick="changeCount(-1)" class="w-24 h-24 bg-slate-700 rounded-full text-6xl font-bold">-</button>
                 <span id="currentCount" class="oswald text-9xl font-black min-w-[200px] text-cyan-400">0</span>
@@ -627,7 +627,7 @@
 
                 column.innerHTML = `
                     <div class="text-center mb-3 w-full">
-                        <span class="block ${getNameSize(rank)} font-bold text-slate-300 truncate px-1">${escapeHtml(data.name)}</span>
+                        <span class="block ${getNameSize(rank)} font-bold text-slate-300 px-1 whitespace-normal break-words">${escapeHtml(data.name)}</span>
                         <span class="oswald ${getScoreSize(rank)} font-bold neon-${rank}">${data.count}</span>
                     </div>
                     <div class="bar-wrapper">
