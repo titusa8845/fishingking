@@ -1092,8 +1092,8 @@
                             }
 
                             console.log(`🎙️ [事件追蹤] eventMessage="${eventMessage}"`);
-                            // 有事件訊息時立刻插播
-                            if (eventMessage) rotateMessage();
+                            // 有事件訊息時立刻插播，並重置計時器確保顯示完整 5 秒
+                            if (eventMessage) { rotateMessage(); scheduleBroadcast(); }
                         } else {
                             console.log(`⏳ [事件追蹤] 玩家尚未出現在數據，下輪再試`);
                         }
@@ -1679,10 +1679,19 @@
             broadcastText.style.animation = '';
         }
 
+        // 可重置的廣播計時器（事件插播後重新計時，確保訊息完整顯示 5 秒）
+        let broadcastTimer = null;
+        function scheduleBroadcast() {
+            clearTimeout(broadcastTimer);
+            broadcastTimer = setTimeout(() => {
+                rotateMessage();
+                scheduleBroadcast();
+            }, 5000);
+        }
+
         // 初始化廣播訊息
         rotateMessage();
-        // 每 5 秒換一句（marquee 動畫 5s，完全滑完後換新訊息）
-        setInterval(rotateMessage, 5000);
+        scheduleBroadcast();
 
         // 載入初始數據
         fetchScores();
