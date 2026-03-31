@@ -492,22 +492,28 @@
 
                 if (!res.ok) {
                     showToast(`網路錯誤: ${res.status}`, 'error');
+                    console.error(`❌ GAS API 失敗 (${res.status}):`, res);
                     return;
                 }
 
                 const data = await res.json();
+                console.log('📊 GAS 返回數據:', data);
 
                 // ✅ 驗證響應格式
                 if (!validateGASResponse(data)) {
                     showToast('數據格式錯誤', 'error');
+                    console.error('❌ 數據驗證失敗:', data);
                     return;
                 }
 
                 // 只在數據確實改變時渲染（避免閃爍）
                 if (JSON.stringify(data) !== JSON.stringify(scores)) {
                     scores = data;
+                    console.log(`✅ 數據已更新 (${data.length} 筆)，開始渲染...`);
                     renderPodium();
                     renderList();
+                } else {
+                    console.log('ℹ️ 數據未變，跳過渲染');
                 }
             } catch (err) {
                 console.error("API 請求失敗:", err);
