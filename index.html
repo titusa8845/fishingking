@@ -782,12 +782,6 @@
          * 5️⃣ 重載排行榜或播放廣播
          */
         async function submitScore() {
-            // 驗證輸入
-            if (currentInputCount === 0) {
-                showToast('請輸入成績（> 0）', 'error');
-                return;
-            }
-
             const name = document.getElementById('playerName').value || "無名大師";
             const btn = document.getElementById('btnSubmit');
 
